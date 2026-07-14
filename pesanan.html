@@ -252,6 +252,10 @@ tbody tr:last-child td{border-bottom:none;}
 .loading,.saving-overlay{z-index:9999;}
 .spinner,.saving-spinner{width:44px;height:44px;border:5px solid var(--panel-border);border-top-color:var(--gold-mid);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 14px;}
 @keyframes spin{to{transform:rotate(360deg);}}
+.saving-check{display:none;width:74px;height:74px;margin:0 auto 14px;}
+.saving-check.show{display:block;animation:pkPop .5s cubic-bezier(.2,.9,.3,1.5);}
+.saving-check svg{width:100%;height:100%;display:block;filter:drop-shadow(0 8px 14px rgba(31,122,77,.45));}
+@keyframes pkPop{0%{transform:scale(0) rotate(-12deg);opacity:0;}60%{transform:scale(1.18) rotate(4deg);}100%{transform:scale(1) rotate(0);opacity:1;}}
 .saving-title{font-weight:700;margin-bottom:4px;}
 .saving-text{font-size:12.5px;color:var(--text-dim);}
 
@@ -641,6 +645,22 @@ tbody tr:last-child td{border-bottom:none;}
 <div class="saving-overlay" id="savingOverlay">
   <div class="saving-box">
     <div class="saving-spinner" id="savingSpinner"></div>
+    <div class="saving-check" id="savingCheck">
+      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="pkChk" cx="42%" cy="34%" r="70%">
+            <stop offset="0%" stop-color="#8FdE6a"/>
+            <stop offset="55%" stop-color="#5cbf5c"/>
+            <stop offset="100%" stop-color="#2f9e3f"/>
+          </radialGradient>
+        </defs>
+        <circle cx="50" cy="53" r="42" fill="#1f7a34"/>
+        <circle cx="50" cy="48" r="42" fill="url(#pkChk)" stroke="#1f7a34" stroke-width="3"/>
+        <ellipse cx="38" cy="30" rx="16" ry="9" fill="#ffffff" opacity="0.28"/>
+        <path d="M32 49 L45 62 L70 34" fill="none" stroke="#ffffff" stroke-width="9"
+          stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
     <div class="saving-title" id="savingTitle">Sedang disimpan...</div>
     <div class="saving-text" id="savingText">Sila tunggu sebentar. Data sedang diproses.</div>
   </div>
@@ -708,10 +728,12 @@ tbody tr:last-child td{border-bottom:none;}
     const titleEl = document.getElementById("savingTitle");
     const textEl = document.getElementById("savingText");
     const spinner = document.getElementById("savingSpinner");
+    const check = document.getElementById("savingCheck");
 
     if (titleEl) titleEl.innerText = title || "Sedang disimpan...";
     if (textEl) textEl.innerText = text || "Sila tunggu sebentar.";
     if (spinner) spinner.style.display = "block";
+    if (check) check.classList.remove("show");
     if (overlay) overlay.classList.add("open");
 
     setSavingButtons(true);
@@ -725,19 +747,31 @@ tbody tr:last-child td{border-bottom:none;}
     if (textEl && text) textEl.innerText = text;
   }
 
-  function showDonePopup(title, text) {
+  function showDonePopup(title, text, success) {
     const titleEl = document.getElementById("savingTitle");
     const textEl = document.getElementById("savingText");
     const spinner = document.getElementById("savingSpinner");
+    const check = document.getElementById("savingCheck");
 
     if (titleEl) titleEl.innerText = title || "Selesai";
     if (textEl) textEl.innerText = text || "Data berjaya disimpan.";
     if (spinner) spinner.style.display = "none";
+    if (check) {
+      if (success) {
+        check.classList.remove("show");
+        void check.offsetWidth; // reset animasi
+        check.classList.add("show");
+      } else {
+        check.classList.remove("show");
+      }
+    }
   }
 
   function hideSavingPopup() {
     const overlay = document.getElementById("savingOverlay");
+    const check = document.getElementById("savingCheck");
     if (overlay) overlay.classList.remove("open");
+    if (check) check.classList.remove("show");
 
     setSavingButtons(false);
   }
@@ -1196,7 +1230,8 @@ tbody tr:last-child td{border-bottom:none;}
         "Selesai!",
         editId
           ? "Pesanan berjaya dikemaskini dan gambar dimuat semula."
-          : "Pesanan berjaya disimpan."
+          : "Pesanan berjaya disimpan.",
+        true
       );
 
       setMsg(
@@ -1215,10 +1250,10 @@ tbody tr:last-child td{border-bottom:none;}
 
       setTimeout(function () {
         hideSavingPopup();
-      }, 1200);
+      }, 1800);
 
     } catch (err) {
-      showDonePopup("Gagal disimpan", err.message);
+      showDonePopup("Gagal disimpan", err.message, false);
 
       setMsg("Gagal: " + err.message, "#dc2626");
       showToast("Gagal: " + err.message, "error");
