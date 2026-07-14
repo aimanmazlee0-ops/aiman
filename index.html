@@ -1,0 +1,1675 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PKPJ · Borang Permohonan Stok</title>
+
+<style>
+@import url('https://script.google.com/macros/s/AKfycbyLsu4ZUtYEO5lhbKWW-VVPEaxvAKlOuAz5X7XppNHdX0lBHoh9273DdBMGNTbrcM4I/exec');
+
+/* ============================================================
+   PKPJ SHARED THEME — gold-on-charcoal design system
+   Dipakai oleh semua halaman: index, pesanan, sebutharga,
+   sejarah_pergerakan, pegawai_stor, ringkasan_aset.
+   ============================================================ */
+:root{
+  --gold-pale:#FEDEA0;
+  --gold-mid:#CCAB6C;
+  --gold-deep:#B38922;
+  --ink:#34312F;
+
+  --bg:#100e0c;
+  --bg-elev:#1a1712;
+  --bg-elev-2:#221e17;
+  --panel:#181410;
+  --panel-border:#332c20;
+  --text:#f3ead6;
+  --text-dim:#a89a7d;
+  --text-faint:#6f6552;
+  --ok:#6fbf8b; --ok-bg:rgba(111,191,139,.12);
+  --err:#e08a6f; --err-bg:rgba(224,138,111,.12);
+  --info:#7fa8e0; --info-bg:rgba(127,168,224,.12);
+  --shadow-soft:0 20px 50px -24px rgba(0,0,0,.65);
+  color-scheme: dark;
+}
+[data-theme="light"]{
+  --bg:#f6efdd;
+  --bg-elev:#fffaf0;
+  --bg-elev-2:#fbf3df;
+  --panel:#fffdf8;
+  --panel-border:#e7d9b6;
+  --text:#2b2416;
+  --text-dim:#7a6a45;
+  --text-faint:#a7996f;
+  --ok:#1f7a4d; --ok-bg:#e4f4ea;
+  --err:#b5442e; --err-bg:#fbeae5;
+  --info:#1d4ed8; --info-bg:#e6edfc;
+  --shadow-soft:0 20px 44px -26px rgba(90,70,20,.35);
+  color-scheme: light;
+}
+
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:'Manrope',-apple-system,BlinkMacSystemFont,sans-serif;
+  background:
+    radial-gradient(900px 420px at 88% -8%, rgba(204,171,108,.16), transparent 60%),
+    radial-gradient(700px 420px at -8% 108%, rgba(179,137,34,.10), transparent 60%),
+    var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  transition:background .35s ease,color .35s ease;
+}
+h1,h2,h3{font-family:'Fraunces',serif;letter-spacing:.2px;margin:0;}
+p{color:var(--text-dim);}
+::selection{background:var(--gold-deep);color:#100e0c;}
+
+/* ============================================================
+   APP SHELL / SIDEBAR
+   ============================================================ */
+.app{display:flex;min-height:100vh;}
+.sidebar{
+  width:236px;flex-shrink:0;padding:26px 18px;
+  background:linear-gradient(175deg,var(--bg-elev) 0%, var(--bg) 120%);
+  border-right:1px solid var(--panel-border);
+  position:fixed;top:0;bottom:0;left:0;overflow-y:auto;
+  display:flex;flex-direction:column;gap:26px;
+}
+.brand{display:flex;align-items:center;gap:12px;}
+.brand-logo{
+  width:44px;height:44px;border-radius:12px;flex-shrink:0;
+  background:linear-gradient(140deg,var(--gold-pale),var(--gold-mid) 55%,var(--gold-deep));
+  color:#241c07;font-weight:800;font-family:'Fraunces',serif;font-size:14px;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 8px 18px -6px rgba(179,137,34,.55);
+}
+.brand h2{font-size:16px;font-weight:600;color:var(--text);margin:0;font-family:'Fraunces',serif;}
+.brand p{margin:3px 0 0;font-size:10.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--text-faint);}
+
+.menu{display:flex;flex-direction:column;gap:5px;}
+.menu a{
+  display:flex;align-items:center;gap:10px;text-decoration:none;
+  color:var(--text-dim);font-size:13px;font-weight:600;
+  padding:11px 13px;border-radius:11px;border:1px solid transparent;transition:.2s;
+}
+.menu a .dot{width:6px;height:6px;border-radius:50%;background:var(--text-faint);flex-shrink:0;}
+.menu a:hover{background:var(--panel);border-color:var(--panel-border);color:var(--text);}
+.menu a.active{background:linear-gradient(135deg,var(--gold-pale),var(--gold-mid));color:#241c07;box-shadow:var(--shadow-soft);}
+.menu a.active .dot{background:#241c07;}
+
+.sidebar-foot{margin-top:auto;padding-top:16px;border-top:1px solid var(--panel-border);}
+.theme-toggle{
+  width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;
+  background:var(--panel);border:1px solid var(--panel-border);color:var(--text);
+  padding:10px 12px;border-radius:12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;
+}
+.theme-toggle .knob{width:34px;height:18px;border-radius:999px;background:var(--panel-border);position:relative;transition:.25s;}
+.theme-toggle .knob::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--gold-mid);transition:.25s;}
+[data-theme="light"] .theme-toggle .knob::after{left:18px;background:var(--gold-deep);}
+
+.main{margin-left:236px;width:calc(100% - 236px);padding:30px 34px 60px;max-width:1220px;}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero{
+  background:linear-gradient(150deg,var(--bg-elev) 0%,var(--bg-elev-2) 100%);
+  border:1px solid var(--panel-border);
+  color:var(--text);border-radius:20px;padding:26px 28px;margin-bottom:22px;
+  box-shadow:var(--shadow-soft);position:relative;overflow:hidden;
+}
+.hero::after{content:"";position:absolute;right:-40px;top:-40px;width:150px;height:150px;border-radius:50%;
+  background:radial-gradient(circle,rgba(204,171,108,.22),transparent 70%);}
+.hero h1{margin:0;font-size:27px;font-weight:600;}
+.hero p{margin:8px 0 0;color:var(--text-dim);}
+
+/* ============================================================
+   TOOLBAR / BUTTONS
+   ============================================================ */
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:22px;}
+button{border:none;cursor:pointer;font-weight:700;border-radius:11px;padding:11px 17px;font-size:12.8px;transition:.2s;letter-spacing:.2px;font-family:inherit;}
+button:hover{transform:translateY(-1px);}
+button:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+.btn-primary{background:linear-gradient(135deg,var(--gold-pale),var(--gold-mid));color:#241c07;box-shadow:0 10px 20px -8px rgba(179,137,34,.55);}
+.btn-blue{background:var(--info);color:#0d1930;}
+.btn-green{background:var(--ok);color:#0e1a13;}
+.btn-red{background:var(--err);color:#2b0e07;}
+.btn-gray{background:var(--bg-elev-2);color:var(--text-dim);border:1px solid var(--panel-border);}
+.btn-small{padding:7px 11px;font-size:11px;border-radius:8px;}
+
+/* ============================================================
+   CARD / SECTIONS
+   ============================================================ */
+.card{
+  background:linear-gradient(165deg,var(--bg-elev),var(--bg-elev-2));
+  border:1px solid var(--panel-border);border-radius:18px;
+  padding:22px 24px;margin-bottom:20px;box-shadow:var(--shadow-soft);
+}
+.card h2{margin:0 0 16px;font-size:17px;font-weight:600;color:var(--text);}
+.list-card{background:linear-gradient(165deg,var(--bg-elev),var(--bg-elev-2));border:1px solid var(--panel-border);border-radius:18px;padding:20px 22px;box-shadow:var(--shadow-soft);}
+
+/* document-style card (sebutharga) */
+.document-box{
+  background:linear-gradient(165deg,var(--bg-elev),var(--bg-elev-2));
+  border:1px solid var(--panel-border);border-radius:18px;padding:24px;margin-bottom:20px;box-shadow:var(--shadow-soft);
+}
+.doc-header{display:flex;justify-content:space-between;gap:22px;flex-wrap:wrap;margin-bottom:18px;padding-bottom:18px;border-bottom:1px dashed var(--panel-border);}
+.company-box h2{font-size:16px;margin-bottom:6px;}
+.company-box p{margin:2px 0;font-size:12.5px;color:var(--text-dim);}
+.info-box{min-width:260px;flex:1;max-width:340px;}
+.info-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;}
+.info-row span{font-size:11.5px;font-weight:700;color:var(--text-dim);flex-shrink:0;}
+.info-row input{max-width:180px;}
+
+/* ============================================================
+   FORM ELEMENTS
+   ============================================================ */
+.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+.form-grid.cols-4{grid-template-columns:repeat(4,1fr);}
+.full{grid-column:1/-1;}
+.half{grid-column:span 2;}
+label{display:block;font-size:11px;font-weight:700;margin-bottom:6px;color:var(--text-dim);letter-spacing:.2px;}
+.required{color:var(--err);}
+input,textarea,select{
+  width:100%;padding:10px 12px;border:1px solid var(--panel-border);border-radius:10px;font-size:13.4px;outline:none;
+  background:var(--bg-elev-2);font-family:inherit;color:var(--text);transition:.2s;
+}
+input:focus,textarea:focus,select:focus{border-color:var(--gold-mid);box-shadow:0 0 0 3px rgba(204,171,108,.18);}
+input[readonly]{opacity:.65;}
+textarea{min-height:70px;resize:vertical;}
+.hint{font-size:11.5px;color:var(--text-faint);margin-top:8px;}
+.search{width:100%;}
+
+/* ============================================================
+   TABLES
+   ============================================================ */
+.table-wrap,.items-table-wrap{overflow-x:auto;border-radius:14px;border:1px solid var(--panel-border);}
+table,.items-table{width:100%;border-collapse:collapse;}
+thead tr{background:var(--bg-elev-2);}
+th{color:var(--gold-mid);font-size:10px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;padding:11px 10px;text-align:left;white-space:nowrap;}
+td{border-bottom:1px solid var(--panel-border);padding:9px 10px;font-size:12.6px;vertical-align:middle;color:var(--text);}
+td input, td textarea{padding:8px 9px;font-size:12.6px;}
+tbody tr{transition:background .15s;}
+tbody tr:hover{background:var(--bg-elev-2);}
+tbody tr:last-child td{border-bottom:none;}
+.kosong,.empty{text-align:center;color:var(--text-faint);padding:24px 10px !important;font-style:italic;}
+.item-desc{min-width:200px;}
+.item-text{min-width:220px;min-height:54px;}
+.item-images-btn{padding:7px 10px;font-size:10.5px;border-radius:8px;background:var(--info);color:#0d1930;border:none;cursor:pointer;white-space:nowrap;font-weight:700;}
+.no-col{width:44px;}
+.qty-col{width:90px;}
+.price-col{width:120px;}
+.amount-col{width:130px;}
+.action-col,.action-buttons{width:90px;}
+
+/* ============================================================
+   TOTALS
+   ============================================================ */
+.total-box,.total-area{
+  max-width:430px;margin-left:auto;margin-top:18px;
+  background:var(--bg-elev-2);border:1px solid var(--panel-border);border-radius:14px;padding:15px;
+}
+.total-row{display:grid;grid-template-columns:1fr 140px;align-items:center;gap:10px;margin-bottom:10px;}
+.total-row:last-child{margin-bottom:0;}
+.total-row span,.total-row b{font-size:13px;color:var(--text-dim);font-weight:700;}
+.grand-total{color:var(--gold-mid) !important;font-size:14px !important;}
+
+/* ============================================================
+   IMAGE UPLOAD / GALLERY
+   ============================================================ */
+.gambar-box{border:1.5px dashed var(--panel-border);border-radius:16px;padding:16px;background:var(--bg-elev-2);}
+.gambar-actions{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px;}
+.gambar-list,.item-images-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:12px;}
+.gambar-item,.item-image-preview{position:relative;border:1px solid var(--panel-border);border-radius:12px;overflow:hidden;background:var(--panel);}
+.gambar-item img,.item-image-preview img{width:100%;height:120px;object-fit:cover;display:block;}
+.gambar-item-name,.item-image-name{padding:8px;font-size:11.5px;word-break:break-word;background:var(--panel);color:var(--text-dim);}
+.gambar-item-delete,.item-image-delete-btn{
+  position:absolute;top:5px;right:5px;background:var(--err);color:#2b0e07;border:none;
+  border-radius:8px;padding:4px 8px;font-size:10.5px;font-weight:800;cursor:pointer;
+}
+.link-gambar{color:var(--gold-mid);font-weight:700;text-decoration:none;}
+.link-gambar:hover{text-decoration:underline;}
+.upload-status{margin-top:10px;padding:8px 13px;border-radius:999px;font-size:12px;font-weight:700;display:inline-block;background:var(--bg-elev-2);color:var(--text-dim);}
+
+/* ============================================================
+   MODALS / OVERLAYS
+   ============================================================ */
+.modal-overlay,.camera-overlay,.item-images-modal,.saving-overlay,.loading{
+  display:none;position:fixed;inset:0;background:rgba(8,7,5,.72);
+  align-items:center;justify-content:center;z-index:999;padding:20px;
+}
+.modal-overlay.open,.camera-overlay.open,.item-images-modal.open{display:flex;}
+.modal-box,.camera-box,.item-images-modal-content,.saving-box,.loading-box{
+  background:var(--bg-elev);border:1px solid var(--panel-border);border-radius:18px;padding:24px;
+  max-width:820px;width:100%;max-height:88vh;overflow-y:auto;box-shadow:0 30px 70px -20px rgba(0,0,0,.6);
+  color:var(--text);text-align:center;
+}
+.modal-close{margin-top:16px;width:100%;background:var(--bg-elev-2);color:var(--text-dim);border:1px solid var(--panel-border);}
+.modal-img{width:100%;max-height:220px;object-fit:cover;border-radius:12px;margin-bottom:12px;background:var(--bg-elev-2);}
+.modal-tag{display:inline-block;font-size:10.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--gold-mid);background:var(--bg-elev-2);border:1px solid var(--panel-border);padding:4px 10px;border-radius:999px;margin-bottom:8px;}
+.modal-detail{text-align:left;margin-top:12px;font-size:13px;color:var(--text-dim);}
+#cameraPreview{width:100%;max-height:400px;background:#000;border-radius:12px;margin-top:10px;}
+.camera-actions{display:flex;gap:10px;margin-top:16px;}
+.camera-actions button{flex:1;}
+
+.loading,.saving-overlay{z-index:9999;}
+.spinner,.saving-spinner{width:44px;height:44px;border:5px solid var(--panel-border);border-top-color:var(--gold-mid);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 14px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.saving-title{font-weight:700;margin-bottom:4px;}
+.saving-text{font-size:12.5px;color:var(--text-dim);}
+
+/* ============================================================
+   SIGNATURE
+   ============================================================ */
+.signature-box{border:1.5px dashed var(--panel-border);border-radius:15px;padding:14px;background:var(--bg-elev-2);}
+.signature-box h3,.signature-box h4{margin:0 0 10px;font-size:12px;color:var(--text-dim);font-weight:700;letter-spacing:.2px;text-transform:uppercase;font-family:'Manrope',sans-serif;}
+#signatureCanvas,canvas.sig-canvas{width:100%;height:180px;background:#fffdf8;border:1px solid var(--panel-border);border-radius:11px;touch-action:none;display:block;}
+
+/* ============================================================
+   STATUS / BADGES (semua varian — dipakai dinamik dari JS)
+   ============================================================ */
+.status,.badge,.status-badge{display:inline-block;padding:5px 11px;border-radius:999px;font-size:10.5px;font-weight:800;letter-spacing:.3px;}
+.status-draf,.status-DRAF,.badge-draf{background:var(--info-bg);color:var(--info);}
+.status-proses,.status-DALAM-PROSES,.status-dihantar,.status-DIHANTAR,.badge-kemaskini,.status-dikemaskini,.status-DIKEMASKINI{background:var(--gold-mid);color:#241c07;background-color:rgba(204,171,108,.18);color:var(--gold-mid);}
+.status-selesai,.status-SELESAI,.badge-selesai,.status-diluluskan,.status-DILULUSKAN,.status-diterima,.status-DITERIMA{background:var(--ok-bg);color:var(--ok);}
+.status-pending,.status-PENDING{background:var(--info-bg);color:var(--info);}
+.status-ditolak,.status-DITOLAK{background:var(--err-bg);color:var(--err);}
+.badge-source{background:var(--bg-elev-2);color:var(--gold-mid);border:1px solid var(--panel-border);}
+
+/* ============================================================
+   SUMMARY / STAT GRIDS
+   ============================================================ */
+.summary-grid,.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;}
+.summary-card,.stat-card{
+  background:linear-gradient(165deg,var(--bg-elev),var(--bg-elev-2));
+  border:1px solid var(--panel-border);border-radius:18px;padding:18px 18px 16px;
+  box-shadow:var(--shadow-soft);position:relative;overflow:hidden;
+}
+.summary-card::after,.stat-card::after{content:"";position:absolute;right:-30px;top:-30px;width:100px;height:100px;border-radius:50%;
+  background:radial-gradient(circle,rgba(204,171,108,.20),transparent 70%);}
+.summary-card .label,.stat-card .lbl{font-size:10.5px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--text-faint);}
+.summary-card .value,.stat-card .num{font-family:'Fraunces',serif;font-size:30px;font-weight:600;color:var(--text);margin-top:6px;}
+
+.filter-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:10px;margin-bottom:16px;}
+
+/* ============================================================
+   ASSET / GRID CARDS (ringkasan_aset)
+   ============================================================ */
+.section-title{font-size:16px;font-weight:600;display:flex;align-items:center;gap:8px;color:var(--text);}
+.section-badge{background:var(--bg-elev-2);color:var(--gold-mid);font-size:10.5px;font-weight:800;padding:3px 9px;border-radius:999px;border:1px solid var(--panel-border);}
+.section-sub{margin:4px 0 14px;font-size:12px;color:var(--text-dim);}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;}
+.asset-card{
+  background:var(--bg-elev-2);border:1px solid var(--panel-border);border-radius:14px;overflow:hidden;cursor:pointer;transition:.2s;
+}
+.asset-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-soft);}
+.asset-img{width:100%;height:120px;object-fit:cover;background:var(--panel);}
+.asset-img.noimg{display:flex;align-items:center;justify-content:center;color:var(--text-faint);font-size:11px;}
+.asset-body{padding:12px;}
+.asset-meta{font-size:11.5px;color:var(--text-dim);margin-top:4px;}
+
+/* ============================================================
+   TIMELINE / STEP (sejarah pergerakan)
+   ============================================================ */
+.timeline{display:flex;align-items:center;gap:4px;}
+.step{width:8px;height:8px;border-radius:50%;background:var(--panel-border);}
+.step.active{background:var(--gold-mid);}
+.line{flex:1;height:2px;background:var(--panel-border);min-width:10px;}
+
+/* ============================================================
+   MESSAGES / TOASTS
+   ============================================================ */
+.msg{margin-top:14px;padding:11px 14px;border-radius:10px;font-weight:700;font-size:12.3px;}
+.toast-notification{
+  position:fixed;top:20px;right:20px;z-index:9999;background:var(--bg-elev);color:var(--text);
+  padding:13px 18px;border-radius:13px;box-shadow:0 18px 40px -14px rgba(0,0,0,.5);border-left:4px solid var(--gold-mid);
+  font-size:12.6px;font-weight:600;display:none;max-width:320px;
+}
+.toast-notification.show{display:block;}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media(max-width:900px){
+  .summary-grid,.stat-row{grid-template-columns:repeat(2,1fr);}
+  .filter-grid{grid-template-columns:1fr 1fr;}
+  .doc-header{flex-direction:column;}
+}
+@media(max-width:760px){
+  .sidebar{width:100%;position:relative;height:auto;padding:16px;}
+  .app{flex-direction:column;}
+  .main{margin-left:0;width:100%;padding:18px;}
+  .form-grid,.form-grid.cols-4{grid-template-columns:1fr;}
+  .full,.half{grid-column:auto;}
+  .summary-grid,.stat-row{grid-template-columns:1fr 1fr;}
+  .filter-grid{grid-template-columns:1fr;}
+}
+
+/* ============================================================
+   DASHBOARD (index.html) — kad KPI, graf, aliran kerja accordion
+   ============================================================ */
+.page-header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:24px;flex-wrap:wrap;}
+.page-header h2{font-size:25px;font-weight:600;color:var(--text);}
+.page-header p{margin:6px 0 0;color:var(--text-dim);font-size:13px;}
+.pill-live{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:800;letter-spacing:.4px;color:var(--gold-mid);background:var(--panel);border:1px solid var(--panel-border);padding:7px 13px;border-radius:999px;}
+.pill-live .blip{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px var(--ok-bg);}
+
+.stat-card{cursor:pointer;transition:.2s;}
+.stat-card:hover{transform:translateY(-2px);}
+.stat-card .sub{font-size:11.5px;color:var(--text-dim);margin-top:4px;}
+.stat-card .bar{height:5px;border-radius:99px;background:var(--panel-border);margin-top:14px;overflow:hidden;}
+.stat-card .bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--gold-mid),var(--gold-deep));width:0%;transition:width .6s ease;}
+
+/* ---- kad KPI bergaya "app card" (badge atas + nombor besar + meta bawah) ---- */
+.stat-card.appcard{
+  border-radius:24px;padding:20px 20px 18px;
+  background:linear-gradient(165deg,var(--bg-elev),var(--bg-elev-2));
+  border:1px solid var(--panel-border);
+}
+.stat-card.appcard .appcard-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:16px;}
+.stat-card.appcard .appcard-badge{
+  display:inline-flex;align-items:center;gap:6px;font-size:10.5px;font-weight:800;letter-spacing:.3px;
+  padding:6px 12px;border-radius:999px;background:rgba(204,171,108,.16);color:var(--gold-mid);
+  border:1px solid rgba(204,171,108,.25);
+}
+.stat-card.appcard .appcard-badge .dotb{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0;}
+.stat-card.appcard .appcard-meta{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text-faint);font-weight:700;}
+.stat-card.appcard .appcard-value{font-family:'Fraunces',serif;font-size:34px;font-weight:600;color:var(--text);line-height:1;margin-bottom:6px;}
+.stat-card.appcard .appcard-label{font-size:12px;color:var(--text-dim);font-weight:700;margin-bottom:14px;}
+.stat-card.appcard .appcard-foot{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:14px;
+  border-top:1px dashed var(--panel-border);
+}
+.stat-card.appcard .appcard-foot .f-lbl{font-size:10px;color:var(--text-faint);font-weight:700;text-transform:uppercase;letter-spacing:.3px;}
+.stat-card.appcard .appcard-foot .f-val{font-size:13px;color:var(--text);font-weight:800;margin-top:2px;}
+.stat-card.appcard .appcard-foot .f-right{text-align:right;}
+
+.chart-card{background:linear-gradient(165deg,var(--bg-elev),var(--bg-elev-2));border:1px solid var(--panel-border);border-radius:18px;padding:20px 22px;box-shadow:var(--shadow-soft);margin-bottom:22px;}
+.chart-card .chart-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;}
+.chart-card h3{font-size:15px;font-weight:600;color:var(--text);}
+.chart-card .chart-head p{margin:2px 0 0;font-size:11.5px;color:var(--text-dim);}
+.chart-legend{display:flex;gap:14px;flex-wrap:wrap;}
+.chart-legend span{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--text-dim);font-weight:700;}
+.chart-legend i{width:8px;height:8px;border-radius:2px;display:inline-block;}
+#chartWrap{width:100%;overflow-x:auto;}
+.bar-rect{transition:height .6s ease, y .6s ease;}
+.bar-label{font-size:13px;font-weight:800;}
+.bar-value-label{font-size:14px;font-weight:800;}
+.bar-axis-label{font-size:11px;font-weight:800;letter-spacing:.3px;}
+
+.chart-split{display:grid;grid-template-columns:1.4fr 1fr;gap:22px;align-items:center;}
+.pie-wrap{display:flex;flex-direction:column;align-items:center;gap:14px;}
+.pie-center-value{font-family:'Fraunces',serif;font-size:22px;font-weight:600;fill:var(--text);}
+.pie-center-label{font-size:9.5px;font-weight:800;letter-spacing:.4px;fill:var(--text-faint);text-transform:uppercase;}
+.pie-seg{transition:stroke-dasharray .6s ease;}
+@media(max-width:900px){
+  .chart-split{grid-template-columns:1fr;}
+}
+
+.flow-item{background:var(--panel);border:1px solid var(--panel-border);border-radius:18px;margin-bottom:16px;overflow:hidden;box-shadow:var(--shadow-soft);transition:box-shadow .25s;}
+.flow-item.open{box-shadow:0 24px 50px -22px rgba(179,137,34,.30), var(--shadow-soft);}
+.flow-head{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;cursor:pointer;user-select:none;}
+.flow-head:hover{background:rgba(204,171,108,.05);}
+.flow-head .left{display:flex;align-items:center;gap:14px;}
+.step-num{width:36px;height:36px;border-radius:11px;flex-shrink:0;background:linear-gradient(140deg,var(--gold-pale),var(--gold-mid));color:#241c07;font-family:'Fraunces',serif;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;transition:transform .25s;}
+.flow-item:hover .step-num{transform:scale(1.06) rotate(-3deg);}
+.flow-head h2{font-size:16px;font-weight:600;color:var(--text);}
+.flow-head .sub{margin:3px 0 0;font-size:12px;color:var(--text-dim);}
+.count-pill{background:var(--bg-elev-2);color:var(--gold-mid);font-size:10.5px;font-weight:800;padding:3px 9px;border-radius:999px;margin-left:8px;border:1px solid var(--panel-border);}
+.chevron{font-size:15px;color:var(--gold-mid);transition:transform .25s;}
+.flow-item.open .chevron{transform:rotate(180deg);}
+.flow-body{display:none;padding:0 20px 22px;border-top:1px solid var(--panel-border);}
+.flow-item.open .flow-body{display:block;padding-top:18px;animation:fadeSlideIn .3s ease;}
+@keyframes fadeSlideIn{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);}}
+.panel-toolbar{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center;}
+.panel-toolbar input{flex:1;min-width:160px;}
+.detail-form{margin-top:18px;padding-top:18px;border-top:1px dashed var(--panel-border);display:none;}
+.detail-form.show{display:block;}
+.detail-form .form-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:10px;flex-wrap:wrap;}
+.detail-form .form-title h3{font-size:15px;font-weight:600;color:var(--text);}
+.sig-existing{display:flex;align-items:center;gap:13px;padding:9px 11px;background:var(--panel);border:1px solid var(--panel-border);border-radius:11px;margin-bottom:9px;}
+.sig-existing img{height:52px;border-radius:8px;border:1px solid var(--panel-border);background:#fff;}
+.sig-existing span{font-size:11px;color:var(--text-dim);}
+.sig-actions{display:flex;gap:8px;margin-top:9px;}
+.msg{display:none;}
+.msg.show{display:block;}
+.msg.ok{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok);}
+.msg.err{background:var(--err-bg);color:var(--err);border:1px solid var(--err);}
+
+.toast-stack{position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:9px;max-width:320px;}
+.toast{display:flex;align-items:flex-start;gap:9px;background:var(--bg-elev);color:var(--text);padding:13px 15px;border-radius:13px;box-shadow:0 18px 40px -14px rgba(0,0,0,.5);border-left:4px solid var(--gold-mid);font-size:12.6px;font-weight:600;line-height:1.4;transform:translateX(120%);opacity:0;animation:toastIn .45s cubic-bezier(.2,.9,.3,1.3) forwards;}
+.toast.err{border-left-color:var(--err);}
+.toast .icn{font-size:16px;line-height:1;margin-top:1px;}
+.toast.leaving{animation:toastOut .35s ease forwards;}
+@keyframes toastIn{to{transform:translateX(0);opacity:1;}}
+@keyframes toastOut{to{transform:translateX(120%);opacity:0;}}
+
+/* ============================================================
+   SAVING OVERLAY (spinner hiasan semasa simpan data)
+   ============================================================ */
+.saving-overlay{
+  display:none;position:fixed;inset:0;background:rgba(8,7,5,.55);
+  backdrop-filter:blur(2px);
+  align-items:center;justify-content:center;z-index:10000;padding:20px;
+}
+.saving-overlay.show{display:flex;}
+.saving-box{
+  background:var(--bg-elev);border:1px solid var(--panel-border);border-radius:18px;
+  padding:30px 34px;box-shadow:0 30px 70px -20px rgba(0,0,0,.6);
+  color:var(--text);text-align:center;min-width:220px;
+}
+.saving-spinner{
+  width:46px;height:46px;border:5px solid var(--panel-border);
+  border-top-color:var(--gold-mid);border-right-color:var(--gold-pale);
+  border-radius:50%;animation:spin .85s linear infinite;margin:0 auto 16px;
+}
+.saving-title{font-weight:700;margin-bottom:4px;font-size:14px;color:var(--text);}
+.saving-text{font-size:12.5px;color:var(--text-dim);}
+
+/* ============================================================
+   SENARAI KESELURUHAN (tab status + carian merentas 4 status)
+   ============================================================ */
+.status-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+.status-tab{
+  background:var(--bg-elev-2);color:var(--text-dim);border:1px solid var(--panel-border);
+  padding:9px 15px;border-radius:11px;font-size:12px;font-weight:800;cursor:pointer;
+  display:flex;align-items:center;gap:8px;transition:.2s;letter-spacing:.2px;
+}
+.status-tab:hover{color:var(--text);border-color:var(--gold-mid);}
+.status-tab .cnt{background:var(--panel);border:1px solid var(--panel-border);border-radius:999px;padding:1px 8px;font-size:10.5px;color:var(--text-faint);}
+.status-tab.active{background:linear-gradient(135deg,var(--gold-pale),var(--gold-mid));color:#241c07;border-color:transparent;box-shadow:var(--shadow-soft);}
+.status-tab.active .cnt{background:rgba(36,28,7,.18);border-color:transparent;color:#241c07;}
+</style>
+</head>
+<body data-theme="dark">
+<script>
+// ============================================================
+// PKPJ — suis Mod Gelap / Mod Terang (dikongsi semua halaman)
+// ============================================================
+(function () {
+  function safeGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function safeSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+
+  function applyTheme(mode) {
+    document.body.setAttribute("data-theme", mode);
+    const label = document.getElementById("themeToggleLabel");
+    if (label) label.textContent = mode === "dark" ? "Mod Gelap" : "Mod Terang";
+    safeSet("pkpj_theme", mode);
+  }
+
+  window.toggleTheme = function () {
+    const cur = document.body.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    applyTheme(cur);
+  };
+
+  document.addEventListener("DOMContentLoaded", function () {
+    applyTheme(safeGet("pkpj_theme") || "dark");
+  });
+})();
+
+</script>
+
+<div class="toast-stack" id="toastStack"></div>
+
+<!-- ================= SAVING OVERLAY (spinner berpusing) ================= -->
+<div class="saving-overlay" id="savingOverlay">
+  <div class="saving-box">
+    <div class="saving-spinner"></div>
+    <div class="saving-title" id="savingTitle">Menyimpan...</div>
+    <div class="saving-text" id="savingText">Sila tunggu sebentar</div>
+  </div>
+</div>
+
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-logo">PKPJ</div>
+      <div>
+        <h1>PKPJ Sistem</h1>
+        <p>Pengurusan Stok</p>
+      </div>
+    </div>
+    <nav class="menu">
+      <a href="index.html" class="active"><span class="dot"></span>Borang Permohonan</a>
+      <a href="pesanan.html"><span class="dot"></span>Pesanan Kerajaan</a>
+      <a href="sebutharga.html"><span class="dot"></span>Perincian Bekalan</a>
+      <a href="sejarah_pergerakan.html"><span class="dot"></span>Sejarah Pergerakan</a>
+      <a href="pegawai_stor.html"><span class="dot"></span>Pegawai Stor</a>
+      <a href="ringkasan_aset.html"><span class="dot"></span>Ringkasan Aset</a>
+    </nav>
+    <div class="sidebar-foot">
+      <button class="theme-toggle" id="themeToggleBtn" onclick="toggleTheme()">
+        <span id="themeToggleLabel">Mod Gelap</span>
+        <span class="knob"></span>
+      </button>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <div class="page-header">
+      <div>
+        <h2>Borang Permohonan Stok</h2>
+        <p>Urus permohonan, kelulusan dan penerimaan stok dalam satu aliran kerja bersepadu.</p>
+      </div>
+      <span class="pill-live"><span class="blip"></span>Data langsung</span>
+    </div>
+
+    <!-- ================= STAT / KPI ROW ================= -->
+    <div class="stat-row">
+      <div class="stat-card appcard" onclick="scrollToAcc('acc-permohonan')">
+        <div class="appcard-top">
+          <span class="appcard-badge"><span class="dotb"></span>Jumlah</span>
+          <span class="appcard-meta">Semua rekod</span>
+        </div>
+        <div class="appcard-value" id="statTotal">0</div>
+        <div class="appcard-label">Jumlah Permohonan</div>
+        <div class="appcard-foot">
+          <div><div class="f-lbl">Status</div><div class="f-val">Semua rekod</div></div>
+          <div class="f-right"><div class="f-lbl">Dalam sistem</div><div class="f-val" id="statTotalMini">0</div></div>
+        </div>
+      </div>
+      <div class="stat-card appcard" onclick="scrollToAcc('acc-pelulus')">
+        <div class="appcard-top">
+          <span class="appcard-badge"><span class="dotb"></span>Pending</span>
+          <span class="appcard-meta">Perlu tindakan</span>
+        </div>
+        <div class="appcard-value" id="statPending">0</div>
+        <div class="appcard-label">Menunggu Kelulusan</div>
+        <div class="appcard-foot">
+          <div><div class="f-lbl">Pelulus</div><div class="f-val">Tindakan perlu</div></div>
+          <div class="f-right"><div class="f-lbl">Rekod</div><div class="f-val" id="statPendingMini">0</div></div>
+        </div>
+      </div>
+      <div class="stat-card appcard" onclick="scrollToAcc('acc-kemaskini')">
+        <div class="appcard-top">
+          <span class="appcard-badge"><span class="dotb"></span>Diluluskan</span>
+          <span class="appcard-meta">Tunggu stor</span>
+        </div>
+        <div class="appcard-value" id="statLulus">0</div>
+        <div class="appcard-label">Diluluskan</div>
+        <div class="appcard-foot">
+          <div><div class="f-lbl">Pegawai stor</div><div class="f-val">Pengesahan</div></div>
+          <div class="f-right"><div class="f-lbl">Rekod</div><div class="f-val" id="statLulusMini">0</div></div>
+        </div>
+      </div>
+      <div class="stat-card appcard" onclick="scrollToAcc('acc-penerimaan')">
+        <div class="appcard-top">
+          <span class="appcard-badge"><span class="dotb"></span>Sedia</span>
+          <span class="appcard-meta">Tunggu terima</span>
+        </div>
+        <div class="appcard-value" id="statSedia">0</div>
+        <div class="appcard-label">Sedia Diterima</div>
+        <div class="appcard-foot">
+          <div><div class="f-lbl">Sah stor</div><div class="f-val">Tunggu penerima</div></div>
+          <div class="f-right"><div class="f-lbl">Rekod</div><div class="f-val" id="statSediaMini">0</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= CHART CARD ================= -->
+    <div class="chart-card">
+      <div class="chart-head">
+        <div>
+          <h3>Taburan Status Permohonan</h3>
+          <p>Bilangan rekod mengikut peringkat aliran kerja</p>
+        </div>
+        <div class="chart-legend">
+          <span><i style="background:var(--info)"></i>Pending</span>
+          <span><i style="background:var(--gold-mid)"></i>Diluluskan</span>
+          <span><i style="background:var(--err)"></i>Ditolak</span>
+          <span><i style="background:var(--ok)"></i>Diterima</span>
+        </div>
+      </div>
+      <div class="chart-split">
+        <div id="chartWrap">
+          <svg id="chartSvg" viewBox="0 0 560 180" width="100%" height="180" preserveAspectRatio="xMinYMid meet"></svg>
+        </div>
+        <div class="pie-wrap">
+          <svg id="pieSvg" viewBox="0 0 200 200" width="180" height="180"></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= SENARAI KESELURUHAN IKUT STATUS ================= -->
+    <div class="chart-card">
+      <div class="chart-head">
+        <div>
+          <h3>Senarai Mengikut Status</h3>
+          <p>Tapis dan cari rekod merentas semua peringkat status</p>
+        </div>
+      </div>
+
+      <div class="status-tabs" id="statusTabs">
+        <div class="status-tab active" data-status="ALL" onclick="setStatusTab('ALL')">Semua <span class="cnt" id="cntALL">0</span></div>
+        <div class="status-tab" data-status="PENDING" onclick="setStatusTab('PENDING')">Pending <span class="cnt" id="cntPENDING">0</span></div>
+        <div class="status-tab" data-status="DILULUSKAN" onclick="setStatusTab('DILULUSKAN')">Diluluskan <span class="cnt" id="cntDILULUSKAN">0</span></div>
+        <div class="status-tab" data-status="DITOLAK" onclick="setStatusTab('DITOLAK')">Ditolak <span class="cnt" id="cntDITOLAK">0</span></div>
+        <div class="status-tab" data-status="DITERIMA" onclick="setStatusTab('DITERIMA')">Diterima <span class="cnt" id="cntDITERIMA">0</span></div>
+      </div>
+
+      <div class="panel-toolbar">
+        <input id="searchSenaraiStatus" type="text" placeholder="Cari mengikut nama item, pemohon, atau ID..." oninput="renderSenaraiStatus()">
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>ID</th><th>Item</th><th>Qty Dipesan</th><th>Qty Diluluskan</th><th>Pemohon</th><th>Status</th></tr>
+          </thead>
+          <tbody id="listSenaraiStatus">
+            <tr><td colspan="6" class="kosong">Memuatkan...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ================= KOTAK 1: BORANG PERMOHONAN ================= -->
+    <section class="flow-item" id="acc-permohonan">
+      <div class="flow-head" onclick="toggleAccordion('acc-permohonan')">
+        <div class="left">
+          <span class="step-num">1</span>
+          <div>
+            <h2>Borang Permohonan <span class="count-pill" id="countPermohonan">0</span></h2>
+            <p class="sub">Senarai permohonan &amp; borang untuk mohon stok baharu.</p>
+          </div>
+        </div>
+        <span class="chevron">▾</span>
+      </div>
+
+      <div class="flow-body">
+        <div class="panel-toolbar">
+          <button type="button" class="btn-primary" onclick="event.stopPropagation(); newPermohonanForm()">+ Permohonan Baru</button>
+          <input id="searchPermohonan" type="text" placeholder="Cari nama item / pemohon..." oninput="renderListPermohonan()">
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>ID</th><th>Item</th><th>Qty</th><th>Pemohon</th><th>Status</th></tr>
+            </thead>
+            <tbody id="listPermohonan">
+              <tr><td colspan="5" class="kosong">Memuatkan...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="detail-form" id="formPermohonan">
+          <div class="form-title">
+            <h3 id="titlePermohonan">Permohonan Baharu</h3>
+            <button type="button" class="btn-gray btn-small" onclick="closeForm('formPermohonan')">Tutup</button>
+          </div>
+
+          <div class="form-grid">
+            <div>
+              <label>Bilangan <span class="required">*</span></label>
+              <input id="bilangan" type="number" min="1" placeholder="Contoh: 1">
+            </div>
+            <div>
+              <label>Kuantiti Dipesan <span class="required">*</span></label>
+              <input id="qty_dipesan" type="number" min="1" placeholder="Contoh: 10">
+            </div>
+            <div class="full">
+              <label>Perihal Stok (Jenis Item) <span class="required">*</span></label>
+              <input id="perihal_stok" type="text" placeholder="Contoh: Kertas A4">
+            </div>
+            <div>
+              <label>Nama Pemohon <span class="required">*</span></label>
+              <input id="pemohon_nama" type="text" placeholder="Nama pemohon">
+            </div>
+            <div>
+              <label>Jawatan Pemohon</label>
+              <input id="pemohon_jawatan" type="text" placeholder="Jawatan">
+            </div>
+            <div class="full">
+              <label>Tarikh Permohonan</label>
+              <input id="pemohon_tarikh" type="date">
+            </div>
+          </div>
+
+          <div class="signature-box">
+            <h4>Tandatangan Pemohon</h4>
+            <div id="existingSigPemohon"></div>
+            <div class="sig-canvas-wrap"><canvas class="sig-canvas" id="sigPemohon"></canvas></div>
+            <div class="sig-actions">
+              <button type="button" class="btn-red btn-small" onclick="clearSig('sigPemohon')">Padam</button>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn-primary" onclick="hantarPermohonan()">Hantar Permohonan</button>
+          </div>
+          <div id="msgPermohonan" class="msg"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= KOTAK 2: PEGAWAI PELULUS ================= -->
+    <section class="flow-item" id="acc-pelulus">
+      <div class="flow-head" onclick="toggleAccordion('acc-pelulus')">
+        <div class="left">
+          <span class="step-num">2</span>
+          <div>
+            <h2>Pegawai Pelulus <span class="count-pill" id="countPelulus">0</span></h2>
+            <p class="sub">Senarai permohonan menunggu kelulusan.</p>
+          </div>
+        </div>
+        <span class="chevron">▾</span>
+      </div>
+
+      <div class="flow-body">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>ID</th><th>Item</th><th>Qty Dipesan</th><th>Pemohon</th><th>Status</th></tr>
+            </thead>
+            <tbody id="listPelulus">
+              <tr><td colspan="5" class="kosong">Memuatkan...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="detail-form" id="formPelulus">
+          <div class="form-title">
+            <h3 id="titlePelulus">Semak Permohonan</h3>
+            <button type="button" class="btn-gray btn-small" onclick="closeForm('formPelulus')">Tutup</button>
+          </div>
+
+          <div class="form-grid">
+            <div>
+              <label>Item</label>
+              <input id="pelulus_item_view" type="text" readonly>
+            </div>
+            <div>
+              <label>Kuantiti Dipesan</label>
+              <input id="qty_dipesan_view" type="text" readonly>
+            </div>
+            <div>
+              <label>Kuantiti Diluluskan <span class="required">*</span></label>
+              <input id="qty_diluluskan" type="number" min="0" oninput="kiraBaki()" placeholder="Contoh: 8">
+            </div>
+            <div>
+              <label>Baki Kuantiti Dipesan</label>
+              <input id="baki_qty" type="text" readonly>
+            </div>
+            <div>
+              <label>Nama Pelulus <span class="required">*</span></label>
+              <input id="pelulus_nama" type="text" placeholder="Nama pegawai pelulus">
+            </div>
+            <div>
+              <label>Jawatan Pelulus</label>
+              <input id="pelulus_jawatan" type="text" placeholder="Jawatan">
+            </div>
+            <div class="full">
+              <label>Tarikh Kelulusan</label>
+              <input id="pelulus_tarikh" type="date">
+            </div>
+            <div class="full">
+              <label>Catatan</label>
+              <textarea id="catatan_pelulus" placeholder="Catatan pegawai pelulus (jika ada)"></textarea>
+            </div>
+          </div>
+
+          <div class="signature-box">
+            <h4>Tandatangan Pegawai Pelulus</h4>
+            <div id="existingSigPelulus"></div>
+            <div class="sig-canvas-wrap"><canvas class="sig-canvas" id="sigPelulus"></canvas></div>
+            <div class="sig-actions">
+              <button type="button" class="btn-red btn-small" onclick="clearSig('sigPelulus')">Padam</button>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn-green" onclick="keputusanPelulus('LULUS')">Luluskan</button>
+            <button type="button" class="btn-red" onclick="keputusanPelulus('TOLAK')">Tolak</button>
+          </div>
+          <div id="msgPelulus" class="msg"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= KOTAK 3: KEMASKINI REKOD (PEGAWAI STOR) ================= -->
+    <section class="flow-item" id="acc-kemaskini">
+      <div class="flow-head" onclick="toggleAccordion('acc-kemaskini')">
+        <div class="left">
+          <span class="step-num">3</span>
+          <div>
+            <h2>Kemaskini Rekod <span class="count-pill" id="countKemaskini">0</span></h2>
+            <p class="sub">Pengesahan Pegawai Stor untuk permohonan yang telah diluluskan.</p>
+          </div>
+        </div>
+        <span class="chevron">▾</span>
+      </div>
+
+      <div class="flow-body">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>ID</th><th>Item</th><th>Qty Diluluskan</th><th>Pemohon</th><th>Status</th></tr>
+            </thead>
+            <tbody id="listKemaskini">
+              <tr><td colspan="5" class="kosong">Memuatkan...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="detail-form" id="formKemaskini">
+          <div class="form-title">
+            <h3 id="titleKemaskini">Pengesahan Pegawai Stor</h3>
+            <div style="display:flex; gap:8px;">
+              <button type="button" class="btn-red btn-small" onclick="padamRekod()">Padam</button>
+              <button type="button" class="btn-gray btn-small" onclick="closeForm('formKemaskini')">Tutup</button>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div>
+              <label>Nama Pegawai Stor <span class="required">*</span></label>
+              <input id="k_stor_nama" type="text" placeholder="Nama pegawai stor">
+            </div>
+            <div>
+              <label>Jawatan Pegawai Stor</label>
+              <input id="k_stor_jawatan" type="text" placeholder="Jawatan">
+            </div>
+            <div class="full">
+              <label>Tarikh</label>
+              <input id="k_stor_tarikh" type="date">
+            </div>
+          </div>
+
+          <div class="signature-box">
+            <h4>Tandatangan Pegawai Stor</h4>
+            <div id="existingSigStor"></div>
+            <div class="sig-canvas-wrap"><canvas class="sig-canvas" id="sigStor"></canvas></div>
+            <div class="sig-actions">
+              <button type="button" class="btn-red btn-small" onclick="clearSig('sigStor')">Padam Tandatangan</button>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn-blue" onclick="simpanKemaskini()">Simpan Pengesahan</button>
+          </div>
+          <div id="msgKemaskini" class="msg"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= KOTAK 4: PERAKUAN PENERIMAAN ================= -->
+    <section class="flow-item" id="acc-penerimaan">
+      <div class="flow-head" onclick="toggleAccordion('acc-penerimaan')">
+        <div class="left">
+          <span class="step-num">4</span>
+          <div>
+            <h2>Perakuan Penerimaan <span class="count-pill" id="countPenerimaan">0</span></h2>
+            <p class="sub">Senarai item yang telah diluluskan, menunggu disahkan terima.</p>
+          </div>
+        </div>
+        <span class="chevron">▾</span>
+      </div>
+
+      <div class="flow-body">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>ID</th><th>Item</th><th>Qty Diluluskan</th><th>Pemohon</th><th>Status</th></tr>
+            </thead>
+            <tbody id="listPenerimaan">
+              <tr><td colspan="5" class="kosong">Memuatkan...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="detail-form" id="formPenerimaan">
+          <div class="form-title">
+            <h3 id="titlePenerimaan">Perakuan Penerimaan</h3>
+            <button type="button" class="btn-gray btn-small" onclick="closeForm('formPenerimaan')">Tutup</button>
+          </div>
+          <p class="sub" id="penerimaanKonteks" style="margin-top:-6px;"></p>
+
+          <div class="form-grid">
+            <div class="full">
+              <label>Nama Pemohon <span class="required">*</span></label>
+              <input id="penerima_nama" type="text" placeholder="Nama pemohon (penerima)">
+            </div>
+            <div>
+              <label>Jawatan</label>
+              <input id="penerima_jawatan" type="text" placeholder="Jawatan">
+            </div>
+            <div>
+              <label>Tarikh Penerimaan</label>
+              <input id="penerima_tarikh" type="date">
+            </div>
+          </div>
+
+          <div class="signature-box">
+            <h4>Tandatangan Pemohon</h4>
+            <div id="existingSigPenerima"></div>
+            <div class="sig-canvas-wrap"><canvas class="sig-canvas" id="sigPenerima"></canvas></div>
+            <div class="sig-actions">
+              <button type="button" class="btn-red btn-small" onclick="clearSig('sigPenerima')">Padam</button>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn-green" onclick="simpanPenerimaan()">Sahkan Penerimaan</button>
+          </div>
+          <div id="msgPenerimaan" class="msg"></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+// ============================================================
+// KONFIGURASI
+// ============================================================
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyLsu4ZUtYEO5lhbKWW-VVPEaxvAKlOuAz5X7XppNHdX0lBHoh9273DdBMGNTbrcM4I/exec";
+const SHEET_SECRET = "pkpj-secret-123";
+
+let semuaRekod = [];
+let currentId = null;          // rekod aktif untuk Kotak 2 / 3 / 4
+let statusTabAktif = "ALL";    // tab status aktif untuk Senarai Mengikut Status
+const sigCanvases = {};
+
+document.addEventListener("DOMContentLoaded", function () {
+  ["sigPemohon", "sigPelulus", "sigStor", "sigPenerima"].forEach(setupSignature);
+  const searchStatusEl = document.getElementById("searchSenaraiStatus");
+  if (searchStatusEl) searchStatusEl.addEventListener("input", renderSenaraiStatus);
+  loadSenarai();
+});
+
+function todayStr() { return new Date().toISOString().split("T")[0]; }
+
+function scrollToAcc(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (!el.classList.contains("open")) toggleAccordion(id);
+  el.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+// ============================================================
+// ACCORDION
+// ============================================================
+function toggleAccordion(id) {
+  document.querySelectorAll(".flow-item").forEach(function (el) {
+    if (el.id !== id) el.classList.remove("open");
+  });
+  const el = document.getElementById(id);
+  el.classList.toggle("open");
+  // PENTING: bila accordion baru dibuka, canvas tandatangan di dalamnya
+  // baru mula ada lebar sebenar (sebelum ini display:none = lebar 0).
+  // Kena resize semula supaya boleh lukis tandatangan dengan betul.
+  if (el.classList.contains("open")) {
+    requestAnimationFrame(function () {
+      Object.keys(sigCanvases).forEach(function (cid) {
+        if (el.contains(document.getElementById(cid))) resizeSig(cid);
+      });
+    });
+  }
+}
+
+function closeForm(formId) {
+  document.getElementById(formId).classList.remove("show");
+}
+
+// ============================================================
+// SAVING OVERLAY (spinner hiasan semasa menunggu simpan)
+// ============================================================
+function showSaving(title, text) {
+  const ov = document.getElementById("savingOverlay");
+  document.getElementById("savingTitle").textContent = title || "Menyimpan...";
+  document.getElementById("savingText").textContent = text || "Sila tunggu sebentar";
+  ov.classList.add("show");
+}
+function hideSaving() {
+  document.getElementById("savingOverlay").classList.remove("show");
+}
+
+// ============================================================
+// SIGNATURE CANVAS
+// ============================================================
+function setupSignature(id) {
+  const canvas = document.getElementById(id);
+  const ctx = canvas.getContext("2d");
+  sigCanvases[id] = { canvas: canvas, ctx: ctx, drawing: false };
+  resizeSig(id);
+  window.addEventListener("resize", function () { resizeSig(id); });
+
+  canvas.addEventListener("mousedown", function (e) { startDraw(id, e); });
+  canvas.addEventListener("mousemove", function (e) { draw(id, e); });
+  canvas.addEventListener("mouseup", function () { stopDraw(id); });
+  canvas.addEventListener("mouseout", function () { stopDraw(id); });
+  canvas.addEventListener("touchstart", function (e) { startDraw(id, e); });
+  canvas.addEventListener("touchmove", function (e) { draw(id, e); });
+  canvas.addEventListener("touchend", function () { stopDraw(id); });
+}
+
+function resizeSig(id) {
+  const s = sigCanvases[id];
+  if (!s) return;
+  const width = s.canvas.offsetWidth;
+  if (!width) return;
+  const old = s.canvas.toDataURL();
+  s.canvas.width = width;
+  s.canvas.height = 140;
+  s.ctx = s.canvas.getContext("2d");
+  s.ctx.lineWidth = 2.5;
+  s.ctx.lineCap = "round";
+  s.ctx.strokeStyle = "#241c07";
+  if (old.length > 20) {
+    const img = new Image();
+    img.onload = function () { s.ctx.drawImage(img, 0, 0); };
+    img.src = old;
+  }
+}
+
+function getPos(canvas, e) {
+  const rect = canvas.getBoundingClientRect();
+  if (e.touches && e.touches.length > 0) return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
+  return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+}
+
+function startDraw(id, e) {
+  e.preventDefault();
+  const s = sigCanvases[id];
+  s.drawing = true;
+  const pos = getPos(s.canvas, e);
+  s.ctx.beginPath();
+  s.ctx.moveTo(pos.x, pos.y);
+}
+
+function draw(id, e) {
+  const s = sigCanvases[id];
+  if (!s.drawing) return;
+  e.preventDefault();
+  const pos = getPos(s.canvas, e);
+  s.ctx.lineTo(pos.x, pos.y);
+  s.ctx.stroke();
+}
+
+function stopDraw(id) { sigCanvases[id].drawing = false; sigCanvases[id].ctx.closePath(); }
+function clearSig(id) { const s = sigCanvases[id]; s.ctx.clearRect(0, 0, s.canvas.width, s.canvas.height); s.ctx.beginPath(); }
+function getSigBase64(id) { return sigCanvases[id].canvas.toDataURL("image/png"); }
+function isSigEmpty(id) { return getSigBase64(id).length < 2000; }
+
+function showExistingSig(containerId, url, labelKosong) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  if (url) {
+    el.innerHTML = '<div class="sig-existing"><img src="' + url + '" alt="tandatangan sedia ada"><span>Tandatangan sedia ada tersimpan. Lukis semula di bawah hanya jika mahu menggantikannya.</span></div>';
+  } else {
+    el.innerHTML = labelKosong ? '<div class="sig-existing"><span>' + labelKosong + '</span></div>' : "";
+  }
+}
+
+function kiraBaki() {
+  const dipesan = parseFloat(document.getElementById("qty_dipesan_view").dataset.raw || 0) || 0;
+  const diluluskan = parseFloat(document.getElementById("qty_diluluskan").value) || 0;
+  document.getElementById("baki_qty").value = dipesan ? (dipesan - diluluskan) : "";
+}
+
+function showMsg(elId, text, ok) {
+  const el = document.getElementById(elId);
+  el.textContent = text;
+  el.className = "msg show " + (ok ? "ok" : "err");
+  setTimeout(function () { el.className = "msg"; }, 4000);
+}
+
+function showToast(text, ok) {
+  const stack = document.getElementById("toastStack");
+  const t = document.createElement("div");
+  t.className = "toast" + (ok ? "" : " err");
+  t.innerHTML = '<span class="icn">' + (ok ? "✓" : "⚠") + '</span><span>' + text + '</span>';
+  stack.appendChild(t);
+  setTimeout(function () {
+    t.classList.add("leaving");
+    setTimeout(function () { t.remove(); }, 350);
+  }, 3200);
+}
+
+// ============================================================
+// LOAD SEMUA REKOD (dikongsi oleh 4 kotak)
+// ============================================================
+async function loadSenarai() {
+  try {
+    const url = APPS_SCRIPT_URL + "?secret=" + encodeURIComponent(SHEET_SECRET) + "&action=permohonan_list_v2";
+    const res = await fetch(url);
+    const result = await res.json();
+    if (!result.ok) throw new Error(result.error || "Ralat tidak diketahui");
+    semuaRekod = result.data || [];
+  } catch (err) {
+    semuaRekod = [];
+    console.error(err);
+  }
+  renderListPermohonan();
+  renderListPelulus();
+  renderListKemaskini();
+  renderListPenerimaan();
+  renderStats();
+  renderChart();
+  renderPieChart();
+  renderSenaraiStatus();
+}
+
+// ---------------- SENARAI KESELURUHAN IKUT STATUS (tab + carian) ----------------
+function setStatusTab(status) {
+  statusTabAktif = status;
+  document.querySelectorAll(".status-tab").forEach(function (el) {
+    el.classList.toggle("active", el.getAttribute("data-status") === status);
+  });
+  renderSenaraiStatus();
+}
+
+function renderSenaraiStatus() {
+  const qEl = document.getElementById("searchSenaraiStatus");
+  const q = (qEl && qEl.value ? qEl.value : "").trim().toLowerCase();
+
+  // kira jumlah setiap status (untuk badge pada tab), berdasarkan carian semasa tetapi bukan tab
+  const counts = { ALL: 0, PENDING: 0, DILULUSKAN: 0, DITOLAK: 0, DITERIMA: 0 };
+  const rekodTertapisCarian = semuaRekod.filter(function (r) {
+    if (!q) return true;
+    const idStr = String(r.id != null ? r.id : "").toLowerCase();
+    const itemStr = String(r.perihal_stok != null ? r.perihal_stok : "").toLowerCase();
+    const namaStr = String(r.pemohon_nama != null ? r.pemohon_nama : "").toLowerCase();
+    return idStr.indexOf(q) !== -1 || itemStr.indexOf(q) !== -1 || namaStr.indexOf(q) !== -1;
+  });
+  rekodTertapisCarian.forEach(function (r) {
+    const s = (r.status || "PENDING").toUpperCase();
+    counts.ALL++;
+    if (counts.hasOwnProperty(s)) counts[s]++;
+  });
+  document.getElementById("cntALL").textContent = counts.ALL;
+  document.getElementById("cntPENDING").textContent = counts.PENDING;
+  document.getElementById("cntDILULUSKAN").textContent = counts.DILULUSKAN;
+  document.getElementById("cntDITOLAK").textContent = counts.DITOLAK;
+  document.getElementById("cntDITERIMA").textContent = counts.DITERIMA;
+
+  const rekod = rekodTertapisCarian.filter(function (r) {
+    if (statusTabAktif === "ALL") return true;
+    return (r.status || "PENDING").toUpperCase() === statusTabAktif;
+  });
+
+  const tbody = document.getElementById("listSenaraiStatus");
+  tbody.innerHTML = "";
+  if (rekod.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" class="kosong">Tiada rekod dijumpai</td></tr>';
+    return;
+  }
+  rekod.forEach(function (r) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = "<td>" + r.id + "</td><td>" + (r.perihal_stok || "-") + "</td><td>" + (r.qty_dipesan || "-") +
+      "</td><td>" + (r.qty_diluluskan || "-") + "</td><td>" + (r.pemohon_nama || "-") + "</td><td>" + statusBadgeHtml(r.status) + "</td>";
+    tr.addEventListener("click", function () { bukaRekodMengikutStatus(r); });
+    tbody.appendChild(tr);
+  });
+}
+
+// Klik baris dalam senarai status → buka accordion & borang yang sesuai mengikut status semasa rekod
+function bukaRekodMengikutStatus(r) {
+  const s = (r.status || "PENDING").toUpperCase();
+  if (s === "PENDING") {
+    scrollToAcc("acc-pelulus");
+    setTimeout(function () { openPelulusForm(r.id); }, 250);
+  } else if (s === "DILULUSKAN" && !r.stor_nama) {
+    scrollToAcc("acc-kemaskini");
+    setTimeout(function () { openKemaskiniForm(r.id); }, 250);
+  } else if (s === "DILULUSKAN" && r.stor_nama) {
+    scrollToAcc("acc-penerimaan");
+    setTimeout(function () { openPenerimaanForm(r.id); }, 250);
+  } else {
+    scrollToAcc("acc-permohonan");
+    setTimeout(function () { openPermohonanForm(r.id); }, 250);
+  }
+}
+
+function statusBadgeHtml(status) {
+  return '<span class="status-badge status-' + (status || "PENDING") + '">' + (status || "PENDING") + "</span>";
+}
+
+// ---------------- STAT CARDS + BAR CHART ----------------
+function renderStats() {
+  const total = semuaRekod.length;
+  const pending = semuaRekod.filter(function (r) { return (r.status || "PENDING").toUpperCase() === "PENDING"; }).length;
+  const lulusMenungguStor = semuaRekod.filter(function (r) { return (r.status || "").toUpperCase() === "DILULUSKAN" && !r.stor_nama; }).length;
+  const sediaTerima = semuaRekod.filter(function (r) { return (r.status || "").toUpperCase() === "DILULUSKAN" && !!r.stor_nama; }).length;
+
+  document.getElementById("statTotal").textContent = total;
+  document.getElementById("statPending").textContent = pending;
+  document.getElementById("statLulus").textContent = lulusMenungguStor;
+  document.getElementById("statSedia").textContent = sediaTerima;
+
+  document.getElementById("statTotalMini").textContent = total;
+  document.getElementById("statPendingMini").textContent = pending;
+  document.getElementById("statLulusMini").textContent = lulusMenungguStor;
+  document.getElementById("statSediaMini").textContent = sediaTerima;
+}
+
+function renderPieChart() {
+  const counts = { PENDING: 0, DILULUSKAN: 0, DITOLAK: 0, DITERIMA: 0 };
+  semuaRekod.forEach(function (r) {
+    const s = (r.status || "PENDING").toUpperCase();
+    if (counts.hasOwnProperty(s)) counts[s]++;
+  });
+  const colorVar = { PENDING: "var(--info)", DILULUSKAN: "var(--gold-mid)", DITOLAK: "var(--err)", DITERIMA: "var(--ok)" };
+  const labels = ["PENDING", "DILULUSKAN", "DITOLAK", "DITERIMA"];
+  const total = labels.reduce(function (sum, k) { return sum + counts[k]; }, 0);
+
+  const cx = 100, cy = 100, r = 78, strokeW = 30;
+  const circumference = 2 * Math.PI * r;
+  let svg = '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="var(--panel-border)" stroke-width="' + strokeW + '"></circle>';
+
+  if (total > 0) {
+    let offsetAcc = 0;
+    labels.forEach(function (key) {
+      const val = counts[key];
+      if (val <= 0) return;
+      const frac = val / total;
+      const segLen = frac * circumference;
+      const dashArray = segLen + " " + (circumference - segLen);
+      const dashOffset = -offsetAcc;
+      svg += '<circle class="pie-seg" cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="none" stroke="' + colorVar[key] +
+        '" stroke-width="' + strokeW + '" stroke-dasharray="' + dashArray + '" stroke-dashoffset="' + dashOffset +
+        '" transform="rotate(-90 ' + cx + ' ' + cy + ')" stroke-linecap="butt"></circle>';
+      offsetAcc += segLen;
+    });
+  }
+
+  svg += '<text class="pie-center-value" x="' + cx + '" y="' + (cy - 4) + '" text-anchor="middle">' + total + '</text>';
+  svg += '<text class="pie-center-label" x="' + cx + '" y="' + (cy + 16) + '" text-anchor="middle">Jumlah</text>';
+
+  document.getElementById("pieSvg").innerHTML = svg;
+}
+
+function renderChart() {
+  const counts = { PENDING: 0, DILULUSKAN: 0, DITOLAK: 0, DITERIMA: 0 };
+  semuaRekod.forEach(function (r) {
+    const s = (r.status || "PENDING").toUpperCase();
+    if (counts.hasOwnProperty(s)) counts[s]++;
+  });
+  const colorVar = { PENDING: "var(--info)", DILULUSKAN: "var(--gold-mid)", DITOLAK: "var(--err)", DITERIMA: "var(--ok)" };
+  const labels = ["PENDING", "DILULUSKAN", "DITOLAK", "DITERIMA"];
+  const max = Math.max(counts.PENDING, counts.DILULUSKAN, counts.DITOLAK, counts.DITERIMA, 1);
+
+  const svgW = 560, svgH = 180, padBottom = 30, padTop = 26, barW = 62, gap = 46;
+  const usableH = svgH - padBottom - padTop;
+  let startX = 40;
+
+  let svg = "";
+  labels.forEach(function (key, i) {
+    const val = counts[key];
+    const h = Math.round((val / max) * usableH);
+    const x = startX + i * (barW + gap);
+    const y = padTop + (usableH - h);
+    // label nilai di atas bar — dijaga supaya tak terkeluar dari kotak SVG walaupun bar sangat tinggi
+    const labelY = Math.max(y - 10, padTop - 8);
+    svg += '<rect class="bar-rect" x="' + x + '" y="' + y + '" width="' + barW + '" height="' + h + '" rx="8" fill="' + colorVar[key] + '"></rect>';
+    svg += '<text class="bar-value-label" x="' + (x + barW / 2) + '" y="' + labelY + '" text-anchor="middle" fill="var(--text)">' + val + '</text>';
+    svg += '<text class="bar-axis-label" x="' + (x + barW / 2) + '" y="' + (svgH - 8) + '" text-anchor="middle" fill="var(--text-faint)">' + key + '</text>';
+  });
+  // garis dasar
+  svg += '<line x1="20" y1="' + (svgH - padBottom + 8) + '" x2="' + (svgW - 20) + '" y2="' + (svgH - padBottom + 8) + '" stroke="var(--panel-border)" stroke-width="1"></line>';
+
+  document.getElementById("chartSvg").innerHTML = svg;
+}
+
+// ---------------- KOTAK 1: senarai semua permohonan ----------------
+function renderListPermohonan() {
+  const q = (document.getElementById("searchPermohonan").value || "").toLowerCase();
+  const rekod = semuaRekod.filter(function (r) {
+    return !q || (r.perihal_stok || "").toLowerCase().indexOf(q) !== -1 || (r.pemohon_nama || "").toLowerCase().indexOf(q) !== -1;
+  });
+
+  document.getElementById("countPermohonan").textContent = semuaRekod.length;
+  const tbody = document.getElementById("listPermohonan");
+  tbody.innerHTML = "";
+  if (rekod.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" class="kosong">Tiada rekod</td></tr>';
+    return;
+  }
+  rekod.forEach(function (r) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = "<td>" + r.id + "</td><td>" + (r.perihal_stok || "-") + "</td><td>" + (r.qty_dipesan || "-") +
+      "</td><td>" + (r.pemohon_nama || "-") + "</td><td>" + statusBadgeHtml(r.status) + "</td>";
+    tr.addEventListener("click", function () { openPermohonanForm(r.id); });
+    tbody.appendChild(tr);
+  });
+}
+
+function newPermohonanForm() {
+  currentId = null;
+  document.getElementById("titlePermohonan").textContent = "Permohonan Baharu";
+  ["bilangan","qty_dipesan","perihal_stok","pemohon_nama","pemohon_jawatan"].forEach(function (id) {
+    document.getElementById(id).value = "";
+  });
+  document.getElementById("pemohon_tarikh").value = todayStr();
+  clearSig("sigPemohon");
+  showExistingSig("existingSigPemohon", "");
+  document.getElementById("formPermohonan").classList.add("show");
+  requestAnimationFrame(function () { resizeSig("sigPemohon"); });
+}
+
+function openPermohonanForm(id) {
+  const r = semuaRekod.find(function (x) { return String(x.id) === String(id); });
+  if (!r) return;
+  currentId = r.id;
+  document.getElementById("titlePermohonan").textContent = "Kemaskini Permohonan - " + r.id;
+  document.getElementById("bilangan").value = r.bilangan || "";
+  document.getElementById("qty_dipesan").value = r.qty_dipesan || "";
+  document.getElementById("perihal_stok").value = r.perihal_stok || "";
+  document.getElementById("pemohon_nama").value = r.pemohon_nama || "";
+  document.getElementById("pemohon_jawatan").value = r.pemohon_jawatan || "";
+  document.getElementById("pemohon_tarikh").value = r.pemohon_tarikh || todayStr();
+  clearSig("sigPemohon");
+  showExistingSig("existingSigPemohon", r.tandatangan_pemohon, "");
+  document.getElementById("formPermohonan").classList.add("show");
+  requestAnimationFrame(function () { resizeSig("sigPemohon"); });
+}
+
+async function hantarPermohonan() {
+  const bilangan = document.getElementById("bilangan").value.trim();
+  const perihal = document.getElementById("perihal_stok").value.trim();
+  const qty = document.getElementById("qty_dipesan").value;
+  const nama = document.getElementById("pemohon_nama").value.trim();
+
+  if (!bilangan) return showMsg("msgPermohonan", "Sila isi Bilangan.", false);
+  if (!perihal) return showMsg("msgPermohonan", "Sila isi Perihal Stok.", false);
+  if (!qty || qty <= 0) return showMsg("msgPermohonan", "Sila isi Kuantiti Dipesan.", false);
+  if (!nama) return showMsg("msgPermohonan", "Sila isi Nama Pemohon.", false);
+
+  const adaTandatanganLama = !!(currentId && (semuaRekod.find(function (x) { return String(x.id) === String(currentId); }) || {}).tandatangan_pemohon);
+  if (isSigEmpty("sigPemohon") && !adaTandatanganLama) {
+    return showMsg("msgPermohonan", "Sila tandatangan sebagai pemohon.", false);
+  }
+
+  const payload = {
+    secret: SHEET_SECRET,
+    action: currentId ? "permohonan_update_pemohon" : "permohonan_create",
+    id: currentId,
+    bilangan: bilangan,
+    perihal_stok: perihal,
+    qty_dipesan: qty,
+    pemohon_nama: nama,
+    pemohon_jawatan: document.getElementById("pemohon_jawatan").value.trim(),
+    pemohon_tarikh: document.getElementById("pemohon_tarikh").value,
+    tandatangan_pemohon: isSigEmpty("sigPemohon") ? "" : getSigBase64("sigPemohon")
+  };
+
+  showSaving("Menyimpan permohonan...", "Sila tunggu sebentar");
+  try {
+    const res = await fetch(APPS_SCRIPT_URL, {
+      method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload)
+    });
+    const result = await res.json();
+    if (!result.ok) throw new Error(result.error || "Ralat tidak diketahui");
+
+    showMsg("msgPermohonan", result.message || "Permohonan berjaya disimpan", true);
+    showToast(result.message || "Permohonan berjaya disimpan", true);
+    await loadSenarai();
+  } catch (err) {
+    showMsg("msgPermohonan", "Gagal: " + err.message, false);
+    showToast("Gagal: " + err.message, false);
+  } finally {
+    hideSaving();
+  }
+}
+
+// ---------------- KOTAK 2: senarai PENDING sahaja ----------------
+function renderListPelulus() {
+  const rekod = semuaRekod.filter(function (r) { return (r.status || "PENDING").toUpperCase() === "PENDING"; });
+  document.getElementById("countPelulus").textContent = rekod.length;
+  const tbody = document.getElementById("listPelulus");
+  tbody.innerHTML = "";
+  if (rekod.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" class="kosong">Tiada permohonan menunggu kelulusan</td></tr>';
+    return;
+  }
+  rekod.forEach(function (r) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = "<td>" + r.id + "</td><td>" + (r.perihal_stok || "-") + "</td><td>" + (r.qty_dipesan || "-") +
+      "</td><td>" + (r.pemohon_nama || "-") + "</td><td>" + statusBadgeHtml(r.status) + "</td>";
+    tr.addEventListener("click", function () { openPelulusForm(r.id); });
+    tbody.appendChild(tr);
+  });
+}
+
+function openPelulusForm(id) {
+  const r = semuaRekod.find(function (x) { return String(x.id) === String(id); });
+  if (!r) return;
+  currentId = r.id;
+  document.getElementById("titlePelulus").textContent = "Semak Permohonan - " + r.id;
+  document.getElementById("pelulus_item_view").value = r.perihal_stok || "";
+  document.getElementById("qty_dipesan_view").value = r.qty_dipesan || "";
+  document.getElementById("qty_dipesan_view").dataset.raw = r.qty_dipesan || 0;
+  document.getElementById("qty_diluluskan").value = "";
+  document.getElementById("baki_qty").value = "";
+  document.getElementById("catatan_pelulus").value = "";
+  document.getElementById("pelulus_nama").value = "";
+  document.getElementById("pelulus_jawatan").value = "";
+  document.getElementById("pelulus_tarikh").value = todayStr();
+  clearSig("sigPelulus");
+  showExistingSig("existingSigPelulus", r.tandatangan_pelulus, "");
+  document.getElementById("formPelulus").classList.add("show");
+  requestAnimationFrame(function () { resizeSig("sigPelulus"); });
+}
+
+async function keputusanPelulus(jenis) {
+  if (!currentId) return;
+  const namaPelulus = document.getElementById("pelulus_nama").value.trim();
+  if (!namaPelulus) return showMsg("msgPelulus", "Sila isi Nama Pelulus.", false);
+
+  if (jenis === "LULUS") {
+    const diluluskan = document.getElementById("qty_diluluskan").value;
+    if (diluluskan === "" || diluluskan < 0) return showMsg("msgPelulus", "Sila isi Kuantiti Diluluskan.", false);
+  }
+  if (isSigEmpty("sigPelulus")) return showMsg("msgPelulus", "Sila tandatangan sebagai pegawai pelulus.", false);
+
+  const payload = {
+    secret: SHEET_SECRET,
+    action: "permohonan_update_pelulus",
+    id: currentId,
+    keputusan: jenis === "TOLAK" ? "TOLAK" : "LULUS",
+    qty_diluluskan: document.getElementById("qty_diluluskan").value,
+    catatan_pelulus: document.getElementById("catatan_pelulus").value.trim(),
+    pelulus_nama: namaPelulus,
+    pelulus_jawatan: document.getElementById("pelulus_jawatan").value.trim(),
+    pelulus_tarikh: document.getElementById("pelulus_tarikh").value || todayStr(),
+    tandatangan_pelulus: getSigBase64("sigPelulus")
+  };
+
+  showSaving(jenis === "TOLAK" ? "Menolak permohonan..." : "Meluluskan permohonan...", "Sila tunggu sebentar");
+  try {
+    const res = await fetch(APPS_SCRIPT_URL, {
+      method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload)
+    });
+    const result = await res.json();
+    if (!result.ok) throw new Error(result.error || "Ralat tidak diketahui");
+
+    showMsg("msgPelulus", result.message || "Berjaya disimpan", true);
+    showToast(result.message || "Berjaya disimpan", true);
+    closeForm("formPelulus");
+    await loadSenarai();
+  } catch (err) {
+    showMsg("msgPelulus", "Gagal: " + err.message, false);
+    showToast("Gagal: " + err.message, false);
+  } finally {
+    hideSaving();
+  }
+}
+
+// ---------------- KOTAK 3: Pengesahan Pegawai Stor ----------------
+function renderListKemaskini() {
+  const rekod = semuaRekod.filter(function (r) { return (r.status || "").toUpperCase() === "DILULUSKAN"; });
+  document.getElementById("countKemaskini").textContent = rekod.length;
+  const tbody = document.getElementById("listKemaskini");
+  tbody.innerHTML = "";
+  if (rekod.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" class="kosong">Tiada rekod menunggu pengesahan stor</td></tr>';
+    return;
+  }
+  rekod.forEach(function (r) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = "<td>" + r.id + "</td><td>" + (r.perihal_stok || "-") + "</td><td>" + (r.qty_diluluskan || "-") +
+      "</td><td>" + (r.pemohon_nama || "-") + "</td><td>" + statusBadgeHtml(r.status) + "</td>";
+    tr.addEventListener("click", function () { openKemaskiniForm(r.id); });
+    tbody.appendChild(tr);
+  });
+}
+
+function openKemaskiniForm(id) {
+  const r = semuaRekod.find(function (x) { return String(x.id) === String(id); });
+  if (!r) return;
+  currentId = r.id;
+  document.getElementById("titleKemaskini").textContent = "Pengesahan Pegawai Stor - " + r.id + " (" + (r.perihal_stok || "-") + ")";
+  document.getElementById("k_stor_nama").value = r.stor_nama || "";
+  document.getElementById("k_stor_jawatan").value = r.stor_jawatan || "";
+  document.getElementById("k_stor_tarikh").value = r.stor_tarikh || todayStr();
+  clearSig("sigStor");
+  showExistingSig("existingSigStor", r.tandatangan_stor, "");
+  document.getElementById("formKemaskini").classList.add("show");
+  requestAnimationFrame(function () { resizeSig("sigStor"); });
+}
+
+async function simpanKemaskini() {
+  if (!currentId) return;
+  const namaStor = document.getElementById("k_stor_nama").value.trim();
+  if (!namaStor) return showMsg("msgKemaskini", "Sila isi Nama Pegawai Stor.", false);
+
+  const rekod = semuaRekod.find(function (x) { return String(x.id) === String(currentId); }) || {};
+  const adaTandatanganLama = !!rekod.tandatangan_stor;
+  if (isSigEmpty("sigStor") && !adaTandatanganLama) {
+    return showMsg("msgKemaskini", "Sila tandatangan sebagai Pegawai Stor.", false);
+  }
+
+  const payload = {
+    secret: SHEET_SECRET,
+    action: "permohonan_update_stor",
+    id: currentId,
+    stor_nama: namaStor,
+    stor_jawatan: document.getElementById("k_stor_jawatan").value.trim(),
+    stor_tarikh: document.getElementById("k_stor_tarikh").value || todayStr(),
+    tandatangan_stor: isSigEmpty("sigStor") ? "" : getSigBase64("sigStor")
+  };
+
+  showSaving("Menyimpan pengesahan...", "Sila tunggu sebentar");
+  try {
+    const res = await fetch(APPS_SCRIPT_URL, {
+      method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload)
+    });
+    const result = await res.json();
+    if (!result.ok) throw new Error(result.error || "Ralat tidak diketahui");
+    showMsg("msgKemaskini", result.message || "Pengesahan berjaya disimpan", true);
+    showToast(result.message || "Pengesahan berjaya disimpan", true);
+    closeForm("formKemaskini");
+    await loadSenarai();
+  } catch (err) {
+    showMsg("msgKemaskini", "Gagal: " + err.message, false);
+    showToast("Gagal: " + err.message, false);
+  } finally {
+    hideSaving();
+  }
+}
+
+async function padamRekod() {
+  if (!currentId) return;
+  if (!confirm("Padam rekod " + currentId + "? Tindakan ini tidak boleh diundur.")) return;
+  showSaving("Memadam rekod...", "Sila tunggu sebentar");
+  try {
+    const res = await fetch(APPS_SCRIPT_URL, {
+      method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ secret: SHEET_SECRET, action: "permohonan_delete_v2", id: currentId })
+    });
+    const result = await res.json();
+    if (!result.ok) throw new Error(result.error || "Ralat tidak diketahui");
+    closeForm("formKemaskini");
+    currentId = null;
+    showToast("Rekod berjaya dipadam", true);
+    await loadSenarai();
+  } catch (err) {
+    showToast("Gagal padam: " + err.message, false);
+  } finally {
+    hideSaving();
+  }
+}
+
+// ---------------- KOTAK 4: hanya rekod yg sudah disahkan Pegawai Stor ----------------
+function renderListPenerimaan() {
+  const rekod = semuaRekod.filter(function (r) {
+    return (r.status || "").toUpperCase() === "DILULUSKAN" && !!r.stor_nama;
+  });
+  document.getElementById("countPenerimaan").textContent = rekod.length;
+  const tbody = document.getElementById("listPenerimaan");
+  tbody.innerHTML = "";
+  if (rekod.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" class="kosong">Tiada item menunggu penerimaan (perlu pengesahan Pegawai Stor di Kotak 3 dahulu)</td></tr>';
+    return;
+  }
+  rekod.forEach(function (r) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = "<td>" + r.id + "</td><td>" + (r.perihal_stok || "-") + "</td><td>" + (r.qty_diluluskan || "-") +
+      "</td><td>" + (r.pemohon_nama || "-") + "</td><td>" + statusBadgeHtml(r.status) + "</td>";
+    tr.addEventListener("click", function () { openPenerimaanForm(r.id); });
+    tbody.appendChild(tr);
+  });
+}
+
+function openPenerimaanForm(id) {
+  const r = semuaRekod.find(function (x) { return String(x.id) === String(id); });
+  if (!r) return;
+  if (!r.stor_nama) {
+    alert("Rekod ini belum disahkan oleh Pegawai Stor di Kotak 3 (Kemaskini Rekod). Sila lengkapkan dahulu.");
+    return;
+  }
+  currentId = r.id;
+  document.getElementById("titlePenerimaan").textContent = "Perakuan Penerimaan - " + r.id;
+  document.getElementById("penerimaanKonteks").textContent = (r.perihal_stok || "-") + " · Qty diluluskan: " + (r.qty_diluluskan || "-");
+  document.getElementById("penerima_nama").value = r.penerima_nama || "";
+  document.getElementById("penerima_jawatan").value = r.penerima_jawatan || "";
+  document.getElementById("penerima_tarikh").value = r.penerima_tarikh || todayStr();
+  clearSig("sigPenerima");
+  showExistingSig("existingSigPenerima", r.tandatangan_penerima, "");
+  document.getElementById("formPenerimaan").classList.add("show");
+  requestAnimationFrame(function () { resizeSig("sigPenerima"); });
+}
+
+async function simpanPenerimaan() {
+  if (!currentId) return;
+  const namaPenerima = document.getElementById("penerima_nama").value.trim();
+  if (!namaPenerima) return showMsg("msgPenerimaan", "Sila isi Nama Pemohon.", false);
+  if (isSigEmpty("sigPenerima")) return showMsg("msgPenerimaan", "Sila tandatangan sebagai pemohon.", false);
+
+  const payload = {
+    secret: SHEET_SECRET,
+    action: "permohonan_update_penerima",
+    id: currentId,
+    penerima_nama: namaPenerima,
+    penerima_jawatan: document.getElementById("penerima_jawatan").value.trim(),
+    penerima_tarikh: document.getElementById("penerima_tarikh").value || todayStr(),
+    tandatangan_penerima: getSigBase64("sigPenerima")
+  };
+
+  showSaving("Menyimpan perakuan penerimaan...", "Sila tunggu sebentar");
+  try {
+    const res = await fetch(APPS_SCRIPT_URL, {
+      method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload)
+    });
+    const result = await res.json();
+    if (!result.ok) throw new Error(result.error || "Ralat tidak diketahui");
+    showMsg("msgPenerimaan", result.message || "Penerimaan berjaya disahkan", true);
+    showToast(result.message || "Penerimaan berjaya disahkan", true);
+    closeForm("formPenerimaan");
+    await loadSenarai();
+  } catch (err) {
+    showMsg("msgPenerimaan", "Gagal: " + err.message, false);
+    showToast("Gagal: " + err.message, false);
+  } finally {
+    hideSaving();
+  }
+}
+</script>
+
+</body>
+</html>
