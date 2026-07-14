@@ -651,6 +651,17 @@ tbody tr:last-child td{border-bottom:none;}
       <div class="modal-box">
         <h3>Pilih Gambar Item</h3>
         <p style="font-size:12px;margin-top:6px;">Gambar dikumpul dari Pesanan Kerajaan yang dipautkan di atas.</p>
+
+        <div id="imgPickerCurrentWrap" style="display:none;margin-top:16px;">
+          <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text-dim);margin-bottom:8px;">Gambar Dipilih Sekarang</p>
+          <div style="display:inline-flex;flex-direction:column;align-items:center;gap:8px;">
+            <div class="item-img-preview-wrap" style="width:90px;height:90px;">
+              <img id="imgPickerCurrentImg" class="preview-thumb" src="" alt="Gambar Dipilih" style="width:90px;height:90px;">
+              <button type="button" class="item-img-remove-btn" title="Padam gambar" onclick="padamGambarDalamModal()">&times;</button>
+            </div>
+          </div>
+        </div>
+
         <div id="imgPickerGrid" class="img-picker-grid"></div>
         <button class="modal-close" onclick="tutupPemilihGambar()">Tutup</button>
       </div>
@@ -920,6 +931,20 @@ tbody tr:last-child td{border-bottom:none;}
     const cell = button.closest(".item-img-picker");
     activeImgPickerTarget = cell.querySelector(".item-gambar-input");
 
+    // Papar gambar yang dipilih sekarang (jika ada) di bahagian atas modal,
+    // lengkap dengan butang padam.
+    const currentWrap = document.getElementById("imgPickerCurrentWrap");
+    const currentImg = document.getElementById("imgPickerCurrentImg");
+    const currentUrl = activeImgPickerTarget ? activeImgPickerTarget.value : "";
+
+    if (currentUrl) {
+      currentImg.src = currentUrl;
+      currentWrap.style.display = "block";
+    } else {
+      currentImg.src = "";
+      currentWrap.style.display = "none";
+    }
+
     const grid = document.getElementById("imgPickerGrid");
 
     if (!imagePool.length) {
@@ -949,6 +974,27 @@ tbody tr:last-child td{border-bottom:none;}
     setItemImagePreview(cell, img.url);
 
     tutupPemilihGambar();
+  }
+
+  // Padam gambar terus dari dalam modal (butang X di atas "Gambar Dipilih
+  // Sekarang"), tanpa perlu tutup modal dahulu.
+  function padamGambarDalamModal() {
+    if (!activeImgPickerTarget) return;
+
+    activeImgPickerTarget.value = "";
+
+    const cell = activeImgPickerTarget.closest(".item-img-picker");
+    if (cell) {
+      const wrap = cell.querySelector(".item-img-preview-wrap");
+      if (wrap) wrap.remove();
+      const noimgBox = cell.querySelector(".noimg-box");
+      if (noimgBox) noimgBox.style.display = "flex";
+    }
+
+    const currentWrap = document.getElementById("imgPickerCurrentWrap");
+    const currentImg = document.getElementById("imgPickerCurrentImg");
+    currentImg.src = "";
+    currentWrap.style.display = "none";
   }
 
   // Papar preview gambar + butang padam (X) kecil di penjuru gambar,
