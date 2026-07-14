@@ -513,10 +513,10 @@ tbody tr:last-child td{border-bottom:none;}
     </div>
 
     <!-- ============================================================
-         PAUTAN KE PESANAN KERAJAAN (baharu)
+         PAUTAN KE PESANAN KERAJAAN
          Pilih rekod Pesanan Kerajaan supaya PO No auto-isi & disepadankan
          dengan No Dokumen Pesanan — ini yang membolehkan gambar item
-         auto keluar kat Ringkasan Aset.
+         auto keluar kat Ringkasan Aset & boleh dipilih di sini.
          ============================================================ -->
     <section class="link-pesanan-box">
       <img id="linkPesananThumb" class="link-pesanan-thumb" style="display:none;" alt="Gambar Pesanan">
@@ -640,7 +640,7 @@ tbody tr:last-child td{border-bottom:none;}
     </section>
 
     <!-- ============================================================
-         MODAL PEMILIH GAMBAR ITEM (baharu)
+         MODAL PEMILIH GAMBAR ITEM
          Papar semua gambar item dari Pesanan Kerajaan yang dipautkan,
          supaya setiap row Sebutharga boleh pilih gambar sendiri.
          ============================================================ -->
@@ -764,7 +764,7 @@ tbody tr:last-child td{border-bottom:none;}
   }
 
   // ============================================================
-  // PAUTAN KE PESANAN KERAJAAN (baharu)
+  // PAUTAN KE PESANAN KERAJAAN
   // ============================================================
   async function loadPesananUntukPautan() {
     const select = document.getElementById("linkPesananSelect");
@@ -819,19 +819,36 @@ tbody tr:last-child td{border-bottom:none;}
     binaImagePool(p);
   }
 
-  // Kumpul semua gambar (dokumen + setiap item) dari satu rekod Pesanan
-  // supaya boleh dipilih untuk setiap row item Sebutharga.
+  // Pisahkan satu string URL (mungkin banyak URL digabung "|") kepada
+  // senarai URL bersih. Digunakan sebab satu item / satu dokumen boleh
+  // ada lebih dari satu gambar (contoh: pesanan.html simpan
+  // itemImageUrls.join("|") untuk setiap item).
+  function splitUrls(raw) {
+    if (!raw) return [];
+    return String(raw)
+      .split("|")
+      .map(function (u) { return u.trim(); })
+      .filter(Boolean);
+  }
+
+  // Kumpul semua gambar (dokumen + setiap item, termasuk item yang ada
+  // BANYAK gambar) dari satu rekod Pesanan supaya semuanya boleh dipilih
+  // untuk setiap row item Sebutharga.
   function binaImagePool(p) {
     imagePool = [];
 
-    if (p.gambar) {
-      imagePool.push({ label: "Gambar Dokumen", url: p.gambar });
-    }
+    splitUrls(p.gambar).forEach(function (url) {
+      imagePool.push({ label: "Gambar Dokumen", url: url });
+    });
 
     (p.items || []).forEach(function (it) {
-      if (it.gambar_item) {
-        imagePool.push({ label: it.perihal || "Item", url: it.gambar_item });
-      }
+      const urls = splitUrls(it.gambar_item);
+      urls.forEach(function (url, idx) {
+        imagePool.push({
+          label: (it.perihal || "Item") + (urls.length > 1 ? " (" + (idx + 1) + ")" : ""),
+          url: url
+        });
+      });
     });
   }
 
@@ -850,8 +867,10 @@ tbody tr:last-child td{border-bottom:none;}
     pill.textContent = "Dipautkan: " + (p.no_dokumen || p.id);
     pill.className = "status-pill ok";
 
+    // Ambil gambar pertama sahaja (dari item atau dokumen) untuk thumbnail kecil
     const gambarItemObj = (p.items || []).find(function (it) { return it.gambar_item; });
-    const gambar = (gambarItemObj && gambarItemObj.gambar_item) || p.gambar || "";
+    const rawGambar = (gambarItemObj && gambarItemObj.gambar_item) || p.gambar || "";
+    const gambar = splitUrls(rawGambar)[0] || "";
 
     if (gambar) {
       thumb.src = gambar;
@@ -892,7 +911,7 @@ tbody tr:last-child td{border-bottom:none;}
   }
 
   // ============================================================
-  // PEMILIH GAMBAR ITEM (baharu)
+  // PEMILIH GAMBAR ITEM
   // ============================================================
   function bukaPemilihGambar(button) {
     const cell = button.closest(".item-img-picker");
@@ -901,7 +920,8 @@ tbody tr:last-child td{border-bottom:none;}
     const grid = document.getElementById("imgPickerGrid");
 
     if (!imagePool.length) {
-      grid.innerHTML = `<div class="img-picker-empty">Tiada gambar tersedia. Sila pautkan Pesanan Kerajaan yang mempunyai gambar dahulu di bahagian atas borang.</div>`;
+      grid.innerHTML = `<div class="img-picker-empty">Tiada gambar tersedia. 
+      Sila pautkan Pesanan Kerajaan yang mempunyai gambar dahulu di bahagian atas borang.</div>`;
     } else {
       grid.innerHTML = imagePool.map(function (img, idx) {
         return `
@@ -1149,8 +1169,9 @@ tbody tr:last-child td{border-bottom:none;}
 
     data.forEach(function (d) {
 
-      const thumbHtml = d.gambar
-        ? `<img class="row-thumb" src="${escapeHtml(d.gambar)}" alt="Gambar" loading="lazy">`
+      const firstGambar = splitUrls(d.gambar)[0] || "";
+      const thumbHtml = firstGambar
+        ? `<img class="row-thumb" src="${escapeHtml(firstGambar)}" alt="Gambar" loading="lazy">`
         : `<span style="color:var(--text-faint);font-size:10.5px;">-</span>`;
 
       if (!d.items || d.items.length === 0) {
@@ -1184,8 +1205,9 @@ tbody tr:last-child td{border-bottom:none;}
 
         d.items.forEach(function(item, index) {
 
-          const itemThumbHtml = item.gambar_item
-            ? `<img class="row-thumb" src="${escapeHtml(item.gambar_item)}" alt="Gambar Item" loading="lazy">`
+          const itemFirstGambar = splitUrls(item.gambar_item)[0] || "";
+          const itemThumbHtml = itemFirstGambar
+            ? `<img class="row-thumb" src="${escapeHtml(itemFirstGambar)}" alt="Gambar Item" loading="lazy">`
             : `<span style="color:var(--text-faint);font-size:10.5px;">-</span>`;
 
           html += `
@@ -1299,7 +1321,7 @@ tbody tr:last-child td{border-bottom:none;}
 
     items.forEach(function (item, index) {
       const tr = document.createElement("tr");
-      const gambarUrl = item.gambar_item || "";
+      const gambarUrl = splitUrls(item.gambar_item)[0] || "";
 
       const imgCellHtml = gambarUrl
         ? `<img class="preview-thumb" src="${escapeHtml(gambarUrl)}" alt="Gambar Item"><div class="noimg-box" style="display:none;">Tiada</div>`
