@@ -220,6 +220,17 @@ tbody tr:last-child td{border-bottom:none;}
 .action-col,.action-buttons{width:90px;}
 .thumb-col{width:64px;}
 .row-thumb{width:44px;height:44px;object-fit:cover;border-radius:8px;border:1px solid var(--panel-border);background:var(--panel);}
+.item-img-col{width:96px;}
+.item-img-picker{display:flex;flex-direction:column;align-items:center;gap:6px;}
+.item-img-picker img{width:52px;height:52px;object-fit:cover;border-radius:8px;border:1px solid var(--panel-border);background:var(--panel);}
+.item-img-picker .noimg-box{width:52px;height:52px;border-radius:8px;border:1.5px dashed var(--panel-border);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--text-faint);text-align:center;}
+.pick-img-btn{padding:5px 8px;font-size:10px;border-radius:7px;background:var(--info);color:#0d1930;border:none;cursor:pointer;font-weight:700;white-space:nowrap;}
+.img-picker-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px;margin-top:14px;}
+.img-picker-item{border:2px solid var(--panel-border);border-radius:12px;overflow:hidden;cursor:pointer;transition:.15s;background:var(--panel);}
+.img-picker-item:hover{border-color:var(--gold-mid);transform:translateY(-2px);}
+.img-picker-item img{width:100%;height:90px;object-fit:cover;display:block;}
+.img-picker-item .lbl{padding:6px;font-size:10.5px;color:var(--text-dim);word-break:break-word;}
+.img-picker-empty{color:var(--text-faint);font-style:italic;padding:20px;text-align:center;}
 
 /* ============================================================
    TOTALS
@@ -565,6 +576,7 @@ tbody tr:last-child td{border-bottom:none;}
           <thead>
             <tr>
               <th class="no-col">No.</th>
+              <th class="item-img-col">Gambar</th>
               <th>Perihal Bekalan / Perkhidmatan Kerja</th>
               <th class="qty-col">Kuantiti</th>
               <th class="price-col">Harga / Unit (RM)</th>
@@ -576,6 +588,13 @@ tbody tr:last-child td{border-bottom:none;}
           <tbody id="itemBody">
             <tr>
               <td class="no-col">1</td>
+              <td class="item-img-col">
+                <div class="item-img-picker">
+                  <div class="noimg-box">Tiada</div>
+                  <input type="hidden" class="item-gambar-input" value="">
+                  <button type="button" class="pick-img-btn" onclick="bukaPemilihGambar(this)">Pilih Gambar</button>
+                </div>
+              </td>
               <td>
                 <textarea class="item-text" placeholder="Masukkan perihal bekalan / perkhidmatan kerja"></textarea>
               </td>
@@ -619,6 +638,20 @@ tbody tr:last-child td{border-bottom:none;}
       </div>
 
     </section>
+
+    <!-- ============================================================
+         MODAL PEMILIH GAMBAR ITEM (baharu)
+         Papar semua gambar item dari Pesanan Kerajaan yang dipautkan,
+         supaya setiap row Sebutharga boleh pilih gambar sendiri.
+         ============================================================ -->
+    <div class="modal-overlay" id="imgPickerModal" onclick="if(event.target===this) tutupPemilihGambar()">
+      <div class="modal-box">
+        <h3>Pilih Gambar Item</h3>
+        <p style="font-size:12px;margin-top:6px;">Gambar dikumpul dari Pesanan Kerajaan yang dipautkan di atas.</p>
+        <div id="imgPickerGrid" class="img-picker-grid"></div>
+        <button class="modal-close" onclick="tutupPemilihGambar()">Tutup</button>
+      </div>
+    </div>
 
     <section class="card">
       <h2>Senarai Sebutharga</h2>
@@ -665,6 +698,8 @@ tbody tr:last-child td{border-bottom:none;}
 
   let allSebutharga = [];
   let allPesananList = []; // senarai Pesanan Kerajaan untuk dropdown pautan
+  let imagePool = [];      // {label, url} — gambar item dari Pesanan yang dipautkan
+  let activeImgPickerTarget = null; // rujukan <input.item-gambar-input> yang sedang dipilih
 
   document.addEventListener("DOMContentLoaded", function () {
     const tarikh = document.getElementById("tarikh");
@@ -766,12 +801,14 @@ tbody tr:last-child td{border-bottom:none;}
 
     if (!id) {
       updateLinkPesananStatus(null);
+      imagePool = [];
       return;
     }
 
     const p = allPesananList.find(function (x) { return String(x.id) === String(id); });
     if (!p) {
       updateLinkPesananStatus(null);
+      imagePool = [];
       return;
     }
 
@@ -779,6 +816,23 @@ tbody tr:last-child td{border-bottom:none;}
     setField("po_no", p.no_dokumen || "");
 
     updateLinkPesananStatus(p);
+    binaImagePool(p);
+  }
+
+  // Kumpul semua gambar (dokumen + setiap item) dari satu rekod Pesanan
+  // supaya boleh dipilih untuk setiap row item Sebutharga.
+  function binaImagePool(p) {
+    imagePool = [];
+
+    if (p.gambar) {
+      imagePool.push({ label: "Gambar Dokumen", url: p.gambar });
+    }
+
+    (p.items || []).forEach(function (it) {
+      if (it.gambar_item) {
+        imagePool.push({ label: it.perihal || "Item", url: it.gambar_item });
+      }
+    });
   }
 
   function updateLinkPesananStatus(p) {
@@ -825,14 +879,68 @@ tbody tr:last-child td{border-bottom:none;}
     if (match) {
       select.value = match.id;
       updateLinkPesananStatus(match);
+      binaImagePool(match);
     } else {
       select.value = "";
       updateLinkPesananStatus(null);
+      imagePool = [];
     }
   }
 
   function normKeyClient(v) {
     return String(v || "").trim().toUpperCase();
+  }
+
+  // ============================================================
+  // PEMILIH GAMBAR ITEM (baharu)
+  // ============================================================
+  function bukaPemilihGambar(button) {
+    const cell = button.closest(".item-img-picker");
+    activeImgPickerTarget = cell.querySelector(".item-gambar-input");
+
+    const grid = document.getElementById("imgPickerGrid");
+
+    if (!imagePool.length) {
+      grid.innerHTML = `<div class="img-picker-empty">Tiada gambar tersedia. Sila pautkan Pesanan Kerajaan yang mempunyai gambar dahulu di bahagian atas borang.</div>`;
+    } else {
+      grid.innerHTML = imagePool.map(function (img, idx) {
+        return `
+          <div class="img-picker-item" onclick="pilihGambarUntukItem(${idx})">
+            <img src="${escapeHtml(img.url)}" alt="${escapeHtml(img.label)}" loading="lazy">
+            <div class="lbl">${escapeHtml(img.label)}</div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    document.getElementById("imgPickerModal").classList.add("open");
+  }
+
+  function pilihGambarUntukItem(idx) {
+    const img = imagePool[idx];
+    if (!img || !activeImgPickerTarget) return;
+
+    activeImgPickerTarget.value = img.url;
+
+    const cell = activeImgPickerTarget.closest(".item-img-picker");
+    let preview = cell.querySelector("img.preview-thumb");
+    const noimgBox = cell.querySelector(".noimg-box");
+
+    if (!preview) {
+      preview = document.createElement("img");
+      preview.className = "preview-thumb";
+      cell.insertBefore(preview, cell.firstChild);
+    }
+    preview.src = img.url;
+
+    if (noimgBox) noimgBox.style.display = "none";
+
+    tutupPemilihGambar();
+  }
+
+  function tutupPemilihGambar() {
+    document.getElementById("imgPickerModal").classList.remove("open");
+    activeImgPickerTarget = null;
   }
 
   function tambahItem() {
@@ -842,6 +950,13 @@ tbody tr:last-child td{border-bottom:none;}
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td class="no-col">${bil}</td>
+      <td class="item-img-col">
+        <div class="item-img-picker">
+          <div class="noimg-box">Tiada</div>
+          <input type="hidden" class="item-gambar-input" value="">
+          <button type="button" class="pick-img-btn" onclick="bukaPemilihGambar(this)">Pilih Gambar</button>
+        </div>
+      </td>
       <td>
         <textarea class="item-text" placeholder="Masukkan perihal bekalan / perkhidmatan kerja"></textarea>
       </td>
@@ -878,11 +993,11 @@ tbody tr:last-child td{border-bottom:none;}
     let total = 0;
 
     document.querySelectorAll("#itemBody tr").forEach(function (row) {
-      const qty = Number(row.children[2].querySelector("input").value) || 0;
-      const harga = Number(row.children[3].querySelector("input").value) || 0;
+      const qty = Number(row.children[3].querySelector("input").value) || 0;
+      const harga = Number(row.children[4].querySelector("input").value) || 0;
       const jumlah = qty * harga;
 
-      row.children[4].querySelector("input").value = jumlah.toFixed(2);
+      row.children[5].querySelector("input").value = jumlah.toFixed(2);
       total += jumlah;
     });
 
@@ -901,17 +1016,19 @@ tbody tr:last-child td{border-bottom:none;}
     const items = [];
 
     document.querySelectorAll("#itemBody tr").forEach(function (row) {
-      const perihal = row.children[1].querySelector("textarea").value.trim();
-      const kuantiti = row.children[2].querySelector("input").value;
-      const harga_unit = row.children[3].querySelector("input").value;
-      const jumlah = row.children[4].querySelector("input").value;
+      const gambarInput = row.children[1].querySelector(".item-gambar-input");
+      const perihal = row.children[2].querySelector("textarea").value.trim();
+      const kuantiti = row.children[3].querySelector("input").value;
+      const harga_unit = row.children[4].querySelector("input").value;
+      const jumlah = row.children[5].querySelector("input").value;
 
       if (perihal !== "") {
         items.push({
           perihal: perihal,
           kuantiti: kuantiti,
           harga_unit: harga_unit,
-          jumlah: jumlah
+          jumlah: jumlah,
+          gambar_item: gambarInput ? gambarInput.value : ""
         });
       }
     });
@@ -1067,11 +1184,15 @@ tbody tr:last-child td{border-bottom:none;}
 
         d.items.forEach(function(item, index) {
 
+          const itemThumbHtml = item.gambar_item
+            ? `<img class="row-thumb" src="${escapeHtml(item.gambar_item)}" alt="Gambar Item" loading="lazy">`
+            : `<span style="color:var(--text-faint);font-size:10.5px;">-</span>`;
+
           html += `
             <tr>
 
               <td class="thumb-col">
-                ${index === 0 ? thumbHtml : ""}
+                ${itemThumbHtml}
               </td>
 
               <td>
@@ -1178,9 +1299,21 @@ tbody tr:last-child td{border-bottom:none;}
 
     items.forEach(function (item, index) {
       const tr = document.createElement("tr");
+      const gambarUrl = item.gambar_item || "";
+
+      const imgCellHtml = gambarUrl
+        ? `<img class="preview-thumb" src="${escapeHtml(gambarUrl)}" alt="Gambar Item"><div class="noimg-box" style="display:none;">Tiada</div>`
+        : `<div class="noimg-box">Tiada</div>`;
 
       tr.innerHTML = `
         <td class="no-col">${index + 1}</td>
+        <td class="item-img-col">
+          <div class="item-img-picker">
+            ${imgCellHtml}
+            <input type="hidden" class="item-gambar-input" value="${escapeHtml(gambarUrl)}">
+            <button type="button" class="pick-img-btn" onclick="bukaPemilihGambar(this)">Pilih Gambar</button>
+          </div>
+        </td>
         <td><textarea class="item-text">${escapeHtml(item.perihal || "")}</textarea></td>
         <td><input type="number" min="0" value="${escapeHtml(item.kuantiti || "")}" oninput="kiraJumlah()"></td>
         <td><input type="number" min="0" step="0.01" value="${escapeHtml(item.harga_unit || "")}" oninput="kiraJumlah()"></td>
