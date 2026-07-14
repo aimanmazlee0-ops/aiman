@@ -224,6 +224,9 @@ tbody tr:last-child td{border-bottom:none;}
 .item-img-picker{display:flex;flex-direction:column;align-items:center;gap:6px;}
 .item-img-picker img{width:52px;height:52px;object-fit:cover;border-radius:8px;border:1px solid var(--panel-border);background:var(--panel);}
 .item-img-picker .noimg-box{width:52px;height:52px;border-radius:8px;border:1.5px dashed var(--panel-border);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--text-faint);text-align:center;}
+.item-img-preview-wrap{position:relative;width:52px;height:52px;}
+.item-img-preview-wrap img{width:52px;height:52px;object-fit:cover;border-radius:8px;border:1px solid var(--panel-border);background:var(--panel);display:block;}
+.item-img-remove-btn{position:absolute;top:-6px;right:-6px;width:18px;height:18px;padding:0;border-radius:50%;background:var(--err);color:#2b0e07;border:none;cursor:pointer;font-size:11px;font-weight:800;line-height:18px;text-align:center;display:flex;align-items:center;justify-content:center;}
 .pick-img-btn{padding:5px 8px;font-size:10px;border-radius:7px;background:var(--info);color:#0d1930;border:none;cursor:pointer;font-weight:700;white-space:nowrap;}
 .img-picker-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px;margin-top:14px;}
 .img-picker-item{border:2px solid var(--panel-border);border-radius:12px;overflow:hidden;cursor:pointer;transition:.15s;background:var(--panel);}
@@ -943,19 +946,48 @@ tbody tr:last-child td{border-bottom:none;}
     activeImgPickerTarget.value = img.url;
 
     const cell = activeImgPickerTarget.closest(".item-img-picker");
-    let preview = cell.querySelector("img.preview-thumb");
-    const noimgBox = cell.querySelector(".noimg-box");
-
-    if (!preview) {
-      preview = document.createElement("img");
-      preview.className = "preview-thumb";
-      cell.insertBefore(preview, cell.firstChild);
-    }
-    preview.src = img.url;
-
-    if (noimgBox) noimgBox.style.display = "none";
+    setItemImagePreview(cell, img.url);
 
     tutupPemilihGambar();
+  }
+
+  // Papar preview gambar + butang padam (X) kecil di penjuru gambar,
+  // dan sembunyikan kotak "Tiada".
+  function setItemImagePreview(cell, url) {
+    const noimgBox = cell.querySelector(".noimg-box");
+    let wrap = cell.querySelector(".item-img-preview-wrap");
+
+    if (!wrap) {
+      wrap = document.createElement("div");
+      wrap.className = "item-img-preview-wrap";
+      wrap.innerHTML = `
+        <img class="preview-thumb" src="" alt="Gambar Item">
+        <button type="button" class="item-img-remove-btn" title="Padam gambar" onclick="padamGambarItem(this)">&times;</button>
+      `;
+      cell.insertBefore(wrap, cell.firstChild);
+    }
+
+    wrap.querySelector("img.preview-thumb").src = url;
+    wrap.style.display = "block";
+
+    if (noimgBox) noimgBox.style.display = "none";
+  }
+
+  // Padam gambar yang dipilih untuk satu item: kosongkan hidden input,
+  // buang preview, dan papar semula kotak "Tiada". Perubahan ini akan
+  // kekal disimpan bila anda tekan "Simpan Sebutharga".
+  function padamGambarItem(button) {
+    const wrap = button.closest(".item-img-preview-wrap");
+    const cell = button.closest(".item-img-picker");
+    if (!cell) return;
+
+    const input = cell.querySelector(".item-gambar-input");
+    if (input) input.value = "";
+
+    if (wrap) wrap.remove();
+
+    const noimgBox = cell.querySelector(".noimg-box");
+    if (noimgBox) noimgBox.style.display = "flex";
   }
 
   function tutupPemilihGambar() {
@@ -1324,7 +1356,10 @@ tbody tr:last-child td{border-bottom:none;}
       const gambarUrl = splitUrls(item.gambar_item)[0] || "";
 
       const imgCellHtml = gambarUrl
-        ? `<img class="preview-thumb" src="${escapeHtml(gambarUrl)}" alt="Gambar Item"><div class="noimg-box" style="display:none;">Tiada</div>`
+        ? `<div class="item-img-preview-wrap">
+             <img class="preview-thumb" src="${escapeHtml(gambarUrl)}" alt="Gambar Item">
+             <button type="button" class="item-img-remove-btn" title="Padam gambar" onclick="padamGambarItem(this)">&times;</button>
+           </div><div class="noimg-box" style="display:none;">Tiada</div>`
         : `<div class="noimg-box">Tiada</div>`;
 
       tr.innerHTML = `
