@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Perincian Bekalan / Perkhidmatan - PKPJ</title>
+
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap');
+
+/* ============================================================
+   PKPJ SHARED THEME — gold-on-charcoal design system
+   Dipakai oleh semua halaman: index, pesanan, sebutharga,
+   sejarah_pergerakan, pegawai_stor, ringkasan_aset.
+   ============================================================ */
+:root{
+  --gold-pale:#FEDEA0;
+  --gold-mid:#CCAB6C;
+  --gold-deep:#B38922;
+  --ink:#34312F;
+
+  --bg:#100e0c;
+  --bg-elev:#1a1712;
+  --bg-elev-2:#221e17;
+  --panel:#181410;
+  --panel-border:#332c20;
+  --text:#f3ead6;
+  --text-dim:#a89a7d;
+  --text-faint:#6f6552;
+  --ok:#6fbf8b; --ok-bg:rgba(111,191,139,.12);
+  --err:#e08a6f; --err-bg:rgba(224,138,111,.12);
+  --info:#7fa8e0; --info-bg:rgba(127,168,224,.12);
+  --shadow-soft:0 20px 50px -24px rgba(0,0,0,.65);
+  color-scheme: dark;
+}
+[data-theme="light"]{
+  --bg:#f6efdd;
+  --bg-elev:#fffaf0;
+  --bg-elev-2:#fbf3df;
+  --panel:#fffdf8;
+  --panel-border:#e7d9b6;
+  --text:#2b2416;
+  --text-dim:#7a6a45;
+  --text-faint:#a7996f;
+  --ok:#1f7a4d; --ok-bg:#e4f4ea;
+  --err:#b5442e; --err-bg:#fbeae5;
+  --info:#1d4ed8; --info-bg:#e6edfc;
+  --shadow-soft:0 20px 44px -26px rgba(90,70,20,.35);
+  color-scheme: light;
+}
+
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:'Manrope',-apple-system,BlinkMacSystemFont,sans-serif;
+  background:
+    radial-gradient(900px 420px at 88% -8%, rgba(204,171,108,.16), transparent 60%),
+    radial-gradient(700px 420px at -8% 108%, rgba(179,137,34,.10), transparent 60%),
+    var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  transition:background .35s ease,color .35s ease;
+}
+h1,h2,h3{font-family:'Fraunces',serif;letter-spacing:.2px;margin:0;}
+p{color:var(--text-dim);}
+::selection{background:var(--gold-deep);color:#100e0c;}
+
+/* ============================================================
+   APP SHELL / SIDEBAR
+   ============================================================ */
+.app{display:flex;min-height:100vh;}
+.sidebar{
+  width:236px;flex-shrink:0;padding:26px 18px;
+  background:linear-gradient(175deg,var(--bg-elev) 0%, var(--bg) 120%);
+  border-right:1px solid var(--panel-border);
+  position:fixed;top:0;bottom:0;left:0;overflow-y:auto;
+  display:flex;flex-direction:column;gap:26px;
+}
+.brand{display:flex;align-items:center;gap:12px;}
+.brand-logo{
+  width:44px;height:44px;border-radius:12px;flex-shrink:0;
+  background:linear-gradient(140deg,var(--gold-pale),var(--gold-mid) 55%,var(--gold-deep));
+  color:#241c07;font-weight:800;font-family:'Fraunces',serif;font-size:14px;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 8px 18px -6px rgba(179,137,34,.55);
+}
+.brand h2{font-size:16px;font-weight:600;color:var(--text);margin:0;font-family:'Fraunces',serif;}
+.brand p{margin:3px 0 0;font-size:10.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--text-faint);}
+
+.menu{display:flex;flex-direction:column;gap:5px;}
+.menu a{
+  display:flex;align-items:center;gap:10px;text-decoration:none;
+  color:var(--text-dim);font-size:13px;font-weight:600;
+  padding:11px 13px;border-radius:11px;border:1px solid transparent;transition:.2s;
+}
+.menu a .dot{width:6px;height:6px;border-radius:50%;background:var(--text-faint);flex-shrink:0;}
+.menu a:hover{background:var(--panel);border-color:var(--panel-border);color:var(--text);}
+.menu a.active{background:linear-gradient(135deg,var(--gold-pale),var(--gold-mid));color:#241c07;box-shadow:var(--shadow-soft);}
+.menu a.active .dot{background:#241c07;}
+
+.sidebar-foot{margin-top:auto;padding-top:16px;border-top:1px solid var(--panel-border);}
+.theme-toggle{
+  width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;
+  background:var(--panel);border:1px solid var(--panel-border);color:var(--text);
+  padding:10px 12px;border-radius:12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;
+}
+.theme-toggle .knob{width:34px;height:18px;border-radius:999px;background:var(--panel-border);position:relative;transition:.25s;}
+.theme-toggle .knob::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--gold-mid);transition:.25s;}
+[data-theme="light"] .theme-toggle .knob::after{left:18px;background:var(--gold-deep);}
+
+.main{margin-left:236px;width:calc(100% - 236px);padding:30px 34px 60px;max-width:1220px;}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero{
+  background:linear-gradient(150deg,var(--bg-elev) 0%,var(--bg-elev-2) 100%);
+  border:1px solid var(--panel-border);
+  color:var(--text);border-radius:20px;padding:26px 28px;margin-bottom:22px;
+  box-shadow:var(--shadow-soft);position:relative;overflow:hidden;
+}
+.hero::after{content:"";position:absolute;right:-40px;top:-40px;width:150px;height:150px;border-radius:50%;
+  background:radial-gradient(circle,rgba(204,171,108,.22),transparent 70%);}
+.hero h1{margin:0;font-size:27px;font-weight:600;}
+.hero p{margin:8px 0 0;color:var(--text-dim);}
+
+/* ============================================================
+   TOOLBAR / BUTTONS
+   ============================================================ */
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:22px;}
+button{border:none;cursor:pointer;font-weight:700;border-radius:11px;padding:11px 17px;font-size:12.8px;transition:.2s;letter-spacing:.2px;font-family:inherit;}
+button:hover{transform:translateY(-1px);}
+button:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+.btn-primary{background:linear-gradient(135deg,var(--gold-pale),var(--gold-mid));color:#241c07;box-shadow:0 10px 20px -8px rgba(179,137,34,.55);}
+.btn-blue{background:var(--info);color:#0d1930;}
+.btn-green{background:var(--ok);color:#0e1a13;}
+.btn-red{background:var(--err);color:#2b0e07;}
+.btn-gray{background:var(--bg-elev-2);color:var(--text-dim);border:1px solid var(--panel-border);}
+.btn-small{padding:7px 11px;font-size:11px;border-radius:8px;}
+
+/* ============================================================
+   CARD / SECTIONS
+   ============================================================ */
+.card{
+  background:linear-gradient(165deg,var(--bg-elev),var(--bg-elev-2));
+  border:1px solid var(--panel-border);border-radius:18px;
+  padding:22px 24px;margin-bottom:20px;box-shadow:var(--shadow-soft);
+}
+.card h2{margin:0 0 16px;font-size:17px;font-weight:600;color:var(--text);}
+.list-card{background:linear-gradient(165deg,var(--bg-elev),var(--bg-elev-2));border:1px solid var(--panel-border);border-radius:18px;padding:20px 22px;box-shadow:var(--shadow-soft);}
+
+/* document-style card (sebutharga) */
+.document-box{
+  background:linear-gradient(165deg,var(--bg-elev),var(--bg-elev-2));
+  border:1px solid var(--panel-border);border-radius:18px;padding:24px;margin-bottom:20px;box-shadow:var(--shadow-soft);
+}
+.doc-header{display:flex;justify-content:space-between;gap:22px;flex-wrap:wrap;margin-bottom:18px;padding-bottom:18px;border-bottom:1px dashed var(--panel-border);}
+.company-box h2{font-size:16px;margin-bottom:6px;}
+.company-box p{margin:2px 0;font-size:12.5px;color:var(--text-dim);}
+.info-box{min-width:260px;flex:1;max-width:340px;}
+.info-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;}
+.info-row span{font-size:11.5px;font-weight:700;color:var(--text-dim);flex-shrink:0;}
+.info-row input{max-width:180px;}
+
+/* ============================================================
+   FORM ELEMENTS
+   ============================================================ */
+.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+.form-grid.cols-4{grid-template-columns:repeat(4,1fr);}
+.full{grid-column:1/-1;}
+.half{grid-column:span 2;}
+label{display:block;font-size:11px;font-weight:700;margin-bottom:6px;color:var(--text-dim);letter-spacing:.2px;}
+.required{color:var(--err);}
+input,textarea,select{
+  width:100%;padding:10px 12px;border:1px solid var(--panel-border);border-radius:10px;font-size:13.4px;outline:none;
+  background:var(--bg-elev-2);font-family:inherit;color:var(--text);transition:.2s;
+}
+input:focus,textarea:focus,select:focus{border-color:var(--gold-mid);box-shadow:0 0 0 3px rgba(204,171,108,.18);}
+input[readonly]{opacity:.65;}
+textarea{min-height:70px;resize:vertical;}
+.hint{font-size:11.5px;color:var(--text-faint);margin-top:8px;}
+.search{width:100%;}
+
+/* ============================================================
+   TABLES
+   ============================================================ */
+.table-wrap,.items-table-wrap{overflow-x:auto;border-radius:14px;border:1px solid var(--panel-border);}
+table,.items-table{width:100%;border-collapse:collapse;}
+thead tr{background:var(--bg-elev-2);}
+th{color:var(--gold-mid);font-size:10px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;padding:11px 10px;text-align:left;white-space:nowrap;}
+td{border-bottom:1px solid var(--panel-border);padding:9px 10px;font-size:12.6px;vertical-align:middle;color:var(--text);}
+td input, td textarea{padding:8px 9px;font-size:12.6px;}
+tbody tr{transition:background .15s;}
+tbody tr:hover{background:var(--bg-elev-2);}
+tbody tr:last-child td{border-bottom:none;}
+.kosong,.empty{text-align:center;color:var(--text-faint);padding:24px 10px !important;font-style:italic;}
+.item-desc{min-width:200px;}
+.item-text{min-width:220px;min-height:54px;}
+.item-images-btn{padding:7px 10px;font-size:10.5px;border-radius:8px;background:var(--info);color:#0d1930;border:none;cursor:pointer;white-space:nowrap;font-weight:700;}
+.no-col{width:44px;}
+.qty-col{width:90px;}
+.price-col{width:120px;}
+.amount-col{width:130px;}
+.action-col,.action-buttons{width:90px;}
+
+/* ============================================================
+   TOTALS
+   ============================================================ */
+.total-box,.total-area{
+  max-width:430px;margin-left:auto;margin-top:18px;
+  background:var(--bg-elev-2);border:1px solid var(--panel-border);border-radius:14px;padding:15px;
+}
+.total-row{display:grid;grid-template-columns:1fr 140px;align-items:center;gap:10px;margin-bottom:10px;}
+.total-row:last-child{margin-bottom:0;}
+.total-row span,.total-row b{font-size:13px;color:var(--text-dim);font-weight:700;}
+.grand-total{color:var(--gold-mid) !important;font-size:14px !important;}
+
+/* ============================================================
+   IMAGE UPLOAD / GALLERY
+   ============================================================ */
+.gambar-box{border:1.5px dashed var(--panel-border);border-radius:16px;padding:16px;background:var(--bg-elev-2);}
+.gambar-actions{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px;}
+.gambar-list,.item-images-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:12px;}
+.gambar-item,.item-image-preview{position:relative;border:1px solid var(--panel-border);border-radius:12px;overflow:hidden;background:var(--panel);}
+.gambar-item img,.item-image-preview img{width:100%;height:120px;object-fit:cover;display:block;}
+.gambar-item-name,.item-image-name{padding:8px;font-size:11.5px;word-break:break-word;background:var(--panel);color:var(--text-dim);}
+.gambar-item-delete,.item-image-delete-btn{
+  position:absolute;top:5px;right:5px;background:var(--err);color:#2b0e07;border:none;
+  border-radius:8px;padding:4px 8px;font-size:10.5px;font-weight:800;cursor:pointer;
+}
+.link-gambar{color:var(--gold-mid);font-weight:700;text-decoration:none;}
+.link-gambar:hover{text-decoration:underline;}
+.upload-status{margin-top:10px;padding:8px 13px;border-radius:999px;font-size:12px;font-weight:700;display:inline-block;background:var(--bg-elev-2);color:var(--text-dim);}
+
+/* ============================================================
+   MODALS / OVERLAYS
+   ============================================================ */
+.modal-overlay,.camera-overlay,.item-images-modal,.saving-overlay,.loading{
+  display:none;position:fixed;inset:0;background:rgba(8,7,5,.72);
+  align-items:center;justify-content:center;z-index:999;padding:20px;
+}
+.modal-overlay.open,.camera-overlay.open,.item-images-modal.open{display:flex;}
+.modal-box,.camera-box,.item-images-modal-content,.saving-box,.loading-box{
+  background:var(--bg-elev);border:1px solid var(--panel-border);border-radius:18px;padding:24px;
+  max-width:820px;width:100%;max-height:88vh;overflow-y:auto;box-shadow:0 30px 70px -20px rgba(0,0,0,.6);
+  color:var(--text);text-align:center;
+}
+.modal-close{margin-top:16px;width:100%;background:var(--bg-elev-2);color:var(--text-dim);border:1px solid var(--panel-border);}
+.modal-img{width:100%;max-height:220px;object-fit:cover;border-radius:12px;margin-bottom:12px;background:var(--bg-elev-2);}
+.modal-tag{display:inline-block;font-size:10.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--gold-mid);background:var(--bg-elev-2);border:1px solid var(--panel-border);padding:4px 10px;border-radius:999px;margin-bottom:8px;}
+.modal-detail{text-align:left;margin-top:12px;font-size:13px;color:var(--text-dim);}
+#cameraPreview{width:100%;max-height:400px;background:#000;border-radius:12px;margin-top:10px;}
+.camera-actions{display:flex;gap:10px;margin-top:16px;}
+.camera-actions button{flex:1;}
+
+.loading,.saving-overlay{z-index:9999;}
+.spinner,.saving-spinner{width:44px;height:44px;border:5px solid var(--panel-border);border-top-color:var(--gold-mid);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 14px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.saving-title{font-weight:700;margin-bottom:4px;}
+.saving-text{font-size:12.5px;color:var(--text-dim);}
+
+/* ============================================================
+   SIGNATURE
+   ============================================================ */
+.signature-box{border:1.5px dashed var(--panel-border);border-radius:15px;padding:14px;background:var(--bg-elev-2);}
+.signature-box h3,.signature-box h4{margin:0 0 10px;font-size:12px;color:var(--text-dim);font-weight:700;letter-spacing:.2px;text-transform:uppercase;font-family:'Manrope',sans-serif;}
+#signatureCanvas,canvas.sig-canvas{width:100%;height:180px;background:#fffdf8;border:1px solid var(--panel-border);border-radius:11px;touch-action:none;display:block;}
+
+/* ============================================================
+   STATUS / BADGES (semua varian — dipakai dinamik dari JS)
+   ============================================================ */
+.status,.badge,.status-badge{display:inline-block;padding:5px 11px;border-radius:999px;font-size:10.5px;font-weight:800;letter-spacing:.3px;}
+.status-draf,.status-DRAF,.badge-draf{background:var(--info-bg);color:var(--info);}
+.status-proses,.status-DALAM-PROSES,.status-dihantar,.status-DIHANTAR,.badge-kemaskini,.status-dikemaskini,.status-DIKEMASKINI{background:var(--gold-mid);color:#241c07;background-color:rgba(204,171,108,.18);color:var(--gold-mid);}
+.status-selesai,.status-SELESAI,.badge-selesai,.status-diluluskan,.status-DILULUSKAN,.status-diterima,.status-DITERIMA{background:var(--ok-bg);color:var(--ok);}
+.status-pending,.status-PENDING{background:var(--info-bg);color:var(--info);}
+.status-ditolak,.status-DITOLAK{background:var(--err-bg);color:var(--err);}
+.badge-source{background:var(--bg-elev-2);color:var(--gold-mid);border:1px solid var(--panel-border);}
+
+/* ============================================================
+   SUMMARY / STAT GRIDS
+   ============================================================ */
+.summary-grid,.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;}
+.summary-card,.stat-card{
+  background:linear-gradient(165deg,var(--bg-elev),var(--bg-elev-2));
+  border:1px solid var(--panel-border);border-radius:18px;padding:18px 18px 16px;
+  box-shadow:var(--shadow-soft);position:relative;overflow:hidden;
+}
+.summary-card::after,.stat-card::after{content:"";position:absolute;right:-30px;top:-30px;width:100px;height:100px;border-radius:50%;
+  background:radial-gradient(circle,rgba(204,171,108,.20),transparent 70%);}
+.summary-card .label,.stat-card .lbl{font-size:10.5px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--text-faint);}
+.summary-card .value,.stat-card .num{font-family:'Fraunces',serif;font-size:30px;font-weight:600;color:var(--text);margin-top:6px;}
+
+.filter-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:10px;margin-bottom:16px;}
+
+/* ============================================================
+   ASSET / GRID CARDS (ringkasan_aset)
+   ============================================================ */
+.section-title{font-size:16px;font-weight:600;display:flex;align-items:center;gap:8px;color:var(--text);}
+.section-badge{background:var(--bg-elev-2);color:var(--gold-mid);font-size:10.5px;font-weight:800;padding:3px 9px;border-radius:999px;border:1px solid var(--panel-border);}
+.section-sub{margin:4px 0 14px;font-size:12px;color:var(--text-dim);}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;}
+.asset-card{
+  background:var(--bg-elev-2);border:1px solid var(--panel-border);border-radius:14px;overflow:hidden;cursor:pointer;transition:.2s;
+}
+.asset-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-soft);}
+.asset-img{width:100%;height:120px;object-fit:cover;background:var(--panel);}
+.asset-img.noimg{display:flex;align-items:center;justify-content:center;color:var(--text-faint);font-size:11px;}
+.asset-body{padding:12px;}
+.asset-meta{font-size:11.5px;color:var(--text-dim);margin-top:4px;}
+
+/* ============================================================
+   TIMELINE / STEP (sejarah pergerakan)
+   ============================================================ */
+.timeline{display:flex;align-items:center;gap:4px;}
+.step{width:8px;height:8px;border-radius:50%;background:var(--panel-border);}
+.step.active{background:var(--gold-mid);}
+.line{flex:1;height:2px;background:var(--panel-border);min-width:10px;}
+
+/* ============================================================
+   MESSAGES / TOASTS
+   ============================================================ */
+.msg{margin-top:14px;padding:11px 14px;border-radius:10px;font-weight:700;font-size:12.3px;}
+.toast-notification{
+  position:fixed;top:20px;right:20px;z-index:9999;background:var(--bg-elev);color:var(--text);
+  padding:13px 18px;border-radius:13px;box-shadow:0 18px 40px -14px rgba(0,0,0,.5);border-left:4px solid var(--gold-mid);
+  font-size:12.6px;font-weight:600;display:none;max-width:320px;
+}
+.toast-notification.show{display:block;}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media(max-width:900px){
+  .summary-grid,.stat-row{grid-template-columns:repeat(2,1fr);}
+  .filter-grid{grid-template-columns:1fr 1fr;}
+  .doc-header{flex-direction:column;}
+}
+@media(max-width:760px){
+  .sidebar{width:100%;position:relative;height:auto;padding:16px;}
+  .app{flex-direction:column;}
+  .main{margin-left:0;width:100%;padding:18px;}
+  .form-grid,.form-grid.cols-4{grid-template-columns:1fr;}
+  .full,.half{grid-column:auto;}
+  .summary-grid,.stat-row{grid-template-columns:1fr 1fr;}
+  .filter-grid{grid-template-columns:1fr;}
+}
+
+/* ============================================================
+   DASHBOARD (index.html) — kad KPI, graf, aliran kerja accordion
+   ============================================================ */
+.page-header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:24px;flex-wrap:wrap;}
+.page-header h2{font-size:25px;font-weight:600;color:var(--text);}
+.page-header p{margin:6px 0 0;color:var(--text-dim);font-size:13px;}
+.pill-live{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:800;letter-spacing:.4px;color:var(--gold-mid);background:var(--panel);border:1px solid var(--panel-border);padding:7px 13px;border-radius:999px;}
+.pill-live .blip{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px var(--ok-bg);}
+
+.stat-card{cursor:pointer;transition:.2s;}
+.stat-card:hover{transform:translateY(-2px);}
+.stat-card .sub{font-size:11.5px;color:var(--text-dim);margin-top:4px;}
+.stat-card .bar{height:5px;border-radius:99px;background:var(--panel-border);margin-top:14px;overflow:hidden;}
+.stat-card .bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--gold-mid),var(--gold-deep));width:0%;transition:width .6s ease;}
+
+.chart-card{background:linear-gradient(165deg,var(--bg-elev),var(--bg-elev-2));border:1px solid var(--panel-border);border-radius:18px;padding:20px 22px;box-shadow:var(--shadow-soft);margin-bottom:22px;}
+.chart-card .chart-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;}
+.chart-card h3{font-size:15px;font-weight:600;color:var(--text);}
+.chart-card .chart-head p{margin:2px 0 0;font-size:11.5px;color:var(--text-dim);}
+.chart-legend{display:flex;gap:14px;flex-wrap:wrap;}
+.chart-legend span{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--text-dim);font-weight:700;}
+.chart-legend i{width:8px;height:8px;border-radius:2px;display:inline-block;}
+#chartWrap{width:100%;overflow-x:auto;}
+.bar-rect{transition:height .6s ease, y .6s ease;}
+.bar-label{font-size:10.5px;font-weight:700;}
+
+.flow-item{background:var(--panel);border:1px solid var(--panel-border);border-radius:18px;margin-bottom:16px;overflow:hidden;box-shadow:var(--shadow-soft);transition:box-shadow .25s;}
+.flow-item.open{box-shadow:0 24px 50px -22px rgba(179,137,34,.30), var(--shadow-soft);}
+.flow-head{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;cursor:pointer;user-select:none;}
+.flow-head:hover{background:rgba(204,171,108,.05);}
+.flow-head .left{display:flex;align-items:center;gap:14px;}
+.step-num{width:36px;height:36px;border-radius:11px;flex-shrink:0;background:linear-gradient(140deg,var(--gold-pale),var(--gold-mid));color:#241c07;font-family:'Fraunces',serif;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;transition:transform .25s;}
+.flow-item:hover .step-num{transform:scale(1.06) rotate(-3deg);}
+.flow-head h2{font-size:16px;font-weight:600;color:var(--text);}
+.flow-head .sub{margin:3px 0 0;font-size:12px;color:var(--text-dim);}
+.count-pill{background:var(--bg-elev-2);color:var(--gold-mid);font-size:10.5px;font-weight:800;padding:3px 9px;border-radius:999px;margin-left:8px;border:1px solid var(--panel-border);}
+.chevron{font-size:15px;color:var(--gold-mid);transition:transform .25s;}
+.flow-item.open .chevron{transform:rotate(180deg);}
+.flow-body{display:none;padding:0 20px 22px;border-top:1px solid var(--panel-border);}
+.flow-item.open .flow-body{display:block;padding-top:18px;animation:fadeSlideIn .3s ease;}
+@keyframes fadeSlideIn{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);}}
+.panel-toolbar{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center;}
+.panel-toolbar input{flex:1;min-width:160px;}
+.detail-form{margin-top:18px;padding-top:18px;border-top:1px dashed var(--panel-border);display:none;}
+.detail-form.show{display:block;}
+.detail-form .form-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:10px;flex-wrap:wrap;}
+.detail-form .form-title h3{font-size:15px;font-weight:600;color:var(--text);}
+.sig-existing{display:flex;align-items:center;gap:13px;padding:9px 11px;background:var(--panel);border:1px solid var(--panel-border);border-radius:11px;margin-bottom:9px;}
+.sig-existing img{height:52px;border-radius:8px;border:1px solid var(--panel-border);background:#fff;}
+.sig-existing span{font-size:11px;color:var(--text-dim);}
+.sig-actions{display:flex;gap:8px;margin-top:9px;}
+.msg{display:none;}
+.msg.show{display:block;}
+.msg.ok{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok);}
+.msg.err{background:var(--err-bg);color:var(--err);border:1px solid var(--err);}
+
+.toast-stack{position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:9px;max-width:320px;}
+.toast{display:flex;align-items:flex-start;gap:9px;background:var(--bg-elev);color:var(--text);padding:13px 15px;border-radius:13px;box-shadow:0 18px 40px -14px rgba(0,0,0,.5);border-left:4px solid var(--gold-mid);font-size:12.6px;font-weight:600;line-height:1.4;transform:translateX(120%);opacity:0;animation:toastIn .45s cubic-bezier(.2,.9,.3,1.3) forwards;}
+.toast.err{border-left-color:var(--err);}
+.toast .icn{font-size:16px;line-height:1;margin-top:1px;}
+.toast.leaving{animation:toastOut .35s ease forwards;}
+@keyframes toastIn{to{transform:translateX(0);opacity:1;}}
+@keyframes toastOut{to{transform:translateX(120%);opacity:0;}}
+
+</style>
+</head>
+
+<body>
+<script>
+// ============================================================
+// PKPJ — suis Mod Gelap / Mod Terang (dikongsi semua halaman)
+// ============================================================
+(function () {
+  function safeGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function safeSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+
+  function applyTheme(mode) {
+    document.body.setAttribute("data-theme", mode);
+    const label = document.getElementById("themeToggleLabel");
+    if (label) label.textContent = mode === "dark" ? "Mod Gelap" : "Mod Terang";
+    safeSet("pkpj_theme", mode);
+  }
+
+  window.toggleTheme = function () {
+    const cur = document.body.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    applyTheme(cur);
+  };
+
+  document.addEventListener("DOMContentLoaded", function () {
+    applyTheme(safeGet("pkpj_theme") || "dark");
+  });
+})();
+
+</script>
+
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-logo">PKPJ</div>
+      <div>
+        <h2>PKPJ Sistem</h2>
+        <p>Pengurusan Stok</p>
+      </div>
+    </div>
+
+    <nav class="menu">
+      <a href="index.html"><span class="dot"></span>Borang Permohonan</a>
+      <a href="pesanan.html"><span class="dot"></span>Pesanan Kerajaan</a>
+      <a href="sebutharga.html" class="active"><span class="dot"></span>Perincian Bekalan</a>
+      <a href="sejarah_pergerakan.html"><span class="dot"></span>Sejarah Pergerakan</a>
+      <a href="pegawai_stor.html"><span class="dot"></span>Pegawai Stor</a>
+      <a href="ringkasan_aset.html"><span class="dot"></span>Ringkasan Aset</a>
+
+    </nav>
+    <div class="sidebar-foot">
+      <button class="theme-toggle" id="themeToggleBtn" onclick="toggleTheme()">
+        <span id="themeToggleLabel">Mod Gelap</span>
+        <span class="knob"></span>
+      </button>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <section class="hero">
+      <h1>Perincian Bekalan / Perkhidmatan Kerja</h1>
+      <p>Senarai item, spesifikasi, kuantiti, harga unit dan jumlah besar.</p>
+    </section>
+
+    <div class="toolbar">
+      <button class="btn-primary" onclick="simpanSebutharga()">Simpan Sebutharga</button>
+      <button class="btn-blue" onclick="tambahItem()">+ Tambah Item</button>
+      <button class="btn-green" onclick="window.print()">Cetak / Save PDF</button>
+      <button class="btn-gray" onclick="resetPage()">Reset</button>
+    </div>
+
+    <section class="document-box">
+      <input type="hidden" id="edit_id">
+
+      <div class="doc-header">
+        <div class="company-box">
+          <h2>Perbadanan Kemajuan Perumahan Negeri Johor</h2>
+          <p>Aras 1 & 2, Bangunan Dato' Abdul Rahman Andak,</p>
+          <p>Kota Iskandar, 79503 Iskandar Puteri,</p>
+          <p>Johor</p>
+          <br>
+          <p><b>U/P: PKPJ</b></p>
+          <p>(Unit IT)</p>
+        </div>
+
+        <div class="info-box">
+          <div class="info-row">
+            <span>Tarikh</span>
+            <input id="tarikh" type="date">
+          </div>
+
+          <div class="info-row">
+            <span>No. Sebutharga</span>
+            <input id="no_sebutharga" value="NHY-SB2026/019">
+          </div>
+
+          <div class="info-row">
+            <span>PO No.</span>
+            <input id="po_no" value="1">
+          </div>
+
+          <div class="info-row">
+            <span>No. MOF</span>
+            <input id="no_mof" value="357-0228475">
+          </div>
+
+          <div class="info-row">
+            <span>Prepared By</span>
+            <input id="prepared_by" value="Muhammad Yazid">
+          </div>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table id="itemTable">
+          <thead>
+            <tr>
+              <th class="no-col">No.</th>
+              <th>Perihal Bekalan / Perkhidmatan Kerja</th>
+              <th class="qty-col">Kuantiti</th>
+              <th class="price-col">Harga / Unit (RM)</th>
+              <th class="amount-col">Jumlah Besar (RM)</th>
+              <th class="action-col">Tindakan</th>
+            </tr>
+          </thead>
+
+          <tbody id="itemBody">
+            <tr>
+              <td class="no-col">1</td>
+              <td>
+                <textarea class="item-text" placeholder="Masukkan perihal bekalan / perkhidmatan kerja"></textarea>
+              </td>
+              <td>
+                <input type="number" value="1" min="0" oninput="kiraJumlah()">
+              </td>
+              <td>
+                <input type="number" value="0.00" min="0" step="0.01" oninput="kiraJumlah()">
+              </td>
+              <td>
+                <input readonly value="0.00">
+              </td>
+              <td class="action-buttons">
+                <button class="btn-small btn-red" onclick="padamItem(this)">Delete</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="total-area">
+        <div class="total-row">
+          <span>Jumlah Termasuk Item</span>
+          <input id="subtotal" readonly value="0.00">
+        </div>
+
+        <div class="total-row">
+          <span>Cukai (%) / Discount</span>
+          <input id="cukai_percent" type="number" value="0" min="0" step="0.01" oninput="kiraJumlah()">
+        </div>
+
+        <div class="total-row">
+          <span>Amaun Cukai / Discount</span>
+          <input id="cukai_amaun" readonly value="0.00">
+        </div>
+
+        <div class="total-row" style="border-top: 2px solid #cbd5e1; padding-top: 12px;">
+          <span class="grand-total">Jumlah Keseluruhan</span>
+          <input id="grand_total" readonly value="0.00" style="font-size: 18px; font-weight: bold;">
+        </div>
+      </div>
+
+    </section>
+
+    <section class="card">
+      <h2>Senarai Sebutharga</h2>
+      <p id="msg" style="font-weight:bold;"></p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>No Sebutharga</th>
+              <th>Tarikh</th>
+              <th>Perihal Bekalan</th>
+              <th>Kuantiti</th>
+              <th>Harga Unit</th>
+              <th>Jumlah</th>
+              <th>Cukai %</th>
+              <th>Prepared By</th>
+              <th>Tindakan</th>
+            </tr>
+          </thead>
+
+          <tbody id="senaraiSebutharga">
+            <tr>
+              <td colspan="10">Memuatkan data...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyLsu4ZUtYEO5lhbKWW-VVPEaxvAKlOuAz5X7XppNHdX0lBHoh9273DdBMGNTbrcM4I/exec";
+  const SHEET_SECRET = "pkpj-secret-123";
+
+  const IS_LOCAL =
+    location.hostname === "127.0.0.1" ||
+    location.hostname === "localhost";
+
+  let allSebutharga = [];
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const tarikh = document.getElementById("tarikh");
+    if (tarikh) tarikh.valueAsDate = new Date();
+
+    kiraJumlah();
+    loadSebutharga();
+  });
+
+  function setMsg(text, color) {
+    const el = document.getElementById("msg");
+    if (!el) return;
+    el.innerText = text;
+    el.style.color = color || "#0f172a";
+  }
+
+  function getValue(id) {
+    const el = document.getElementById(id);
+    return el ? el.value : "";
+  }
+
+  function setField(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.value = value || "";
+  }
+
+  async function sendToAppsScript(payload) {
+    const bodyData = JSON.stringify({
+      secret: SHEET_SECRET,
+      ...payload
+    });
+
+    if (IS_LOCAL) {
+      await fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        body: bodyData
+      });
+
+      return {
+        ok: true,
+        local: true
+      };
+    }
+
+    const res = await fetch(APPS_SCRIPT_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "text/plain;charset=utf-8"
+      },
+      body: bodyData
+    });
+
+    const result = await res.json();
+
+    if (!result.ok) {
+      throw new Error(result.error || "Gagal proses data.");
+    }
+
+    return result;
+  }
+
+  function tambahItem() {
+    const tbody = document.getElementById("itemBody");
+    const bil = tbody.children.length + 1;
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td class="no-col">${bil}</td>
+      <td>
+        <textarea class="item-text" placeholder="Masukkan perihal bekalan / perkhidmatan kerja"></textarea>
+      </td>
+      <td><input type="number" value="1" min="0" oninput="kiraJumlah()"></td>
+      <td><input type="number" value="0.00" min="0" step="0.01" oninput="kiraJumlah()"></td>
+      <td><input readonly value="0.00"></td>
+      <td class="action-buttons">
+        <button class="btn-small btn-red" onclick="padamItem(this)">Delete</button>
+      </td>
+    `;
+
+    tbody.appendChild(tr);
+  }
+
+  function padamItem(button) {
+    const tbody = document.getElementById("itemBody");
+    button.closest("tr").remove();
+
+    if (tbody.children.length === 0) {
+      tambahItem();
+    }
+
+    susunBil();
+    kiraJumlah();
+  }
+
+  function susunBil() {
+    document.querySelectorAll("#itemBody tr").forEach(function (row, index) {
+      row.children[0].innerText = index + 1;
+    });
+  }
+
+  function kiraJumlah() {
+    let total = 0;
+
+    document.querySelectorAll("#itemBody tr").forEach(function (row) {
+      const qty = Number(row.children[2].querySelector("input").value) || 0;
+      const harga = Number(row.children[3].querySelector("input").value) || 0;
+      const jumlah = qty * harga;
+
+      row.children[4].querySelector("input").value = jumlah.toFixed(2);
+      total += jumlah;
+    });
+
+    document.getElementById("subtotal").value = total.toFixed(2);
+
+    const cukai_percent = Number(document.getElementById("cukai_percent").value) || 0;
+    const cukai_amaun = (total * cukai_percent) / 100;
+
+    document.getElementById("cukai_amaun").value = cukai_amaun.toFixed(2);
+
+    const grand_total = total + cukai_amaun;
+    document.getElementById("grand_total").value = grand_total.toFixed(2);
+  }
+
+  function collectItems() {
+    const items = [];
+
+    document.querySelectorAll("#itemBody tr").forEach(function (row) {
+      const perihal = row.children[1].querySelector("textarea").value.trim();
+      const kuantiti = row.children[2].querySelector("input").value;
+      const harga_unit = row.children[3].querySelector("input").value;
+      const jumlah = row.children[4].querySelector("input").value;
+
+      if (perihal !== "") {
+        items.push({
+          perihal: perihal,
+          kuantiti: kuantiti,
+          harga_unit: harga_unit,
+          jumlah: jumlah
+        });
+      }
+    });
+
+    return items;
+  }
+
+  async function simpanSebutharga() {
+    const editId = getValue("edit_id");
+    const localId = editId || ("SH-" + Date.now());
+    const items = collectItems();
+
+    if (!getValue("no_sebutharga")) {
+      setMsg("Sila isi No. Sebutharga.", "#dc2626");
+      return;
+    }
+
+    if (items.length === 0) {
+      setMsg("Sila isi sekurang-kurangnya satu item.", "#dc2626");
+      return;
+    }
+
+    const record = {
+      id: localId,
+      tarikh: getValue("tarikh"),
+      no_sebutharga: getValue("no_sebutharga"),
+      po_no: getValue("po_no"),
+      no_mof: getValue("no_mof"),
+      prepared_by: getValue("prepared_by"),
+      items: items,
+      subtotal: getValue("subtotal"),
+      cukai_percent: getValue("cukai_percent"),
+      cukai_amaun: getValue("cukai_amaun"),
+      grand_total: getValue("grand_total"),
+      status: "DRAF"
+    };
+
+    try {
+      setMsg("Sedang simpan sebutharga...", "#2563eb");
+
+      await sendToAppsScript({
+        action: editId ? "sebutharga_update" : "sebutharga_create",
+        ...record
+      });
+
+      saveLocalRecord(record);
+
+      setMsg(editId ? "Sebutharga berjaya dikemaskini." : "Sebutharga berjaya disimpan.", "#16a34a");
+
+      resetFormOnly();
+      loadSebutharga();
+
+    } catch (err) {
+      setMsg("Gagal simpan: " + err.message, "#dc2626");
+    }
+  }
+
+  function saveLocalRecord(record) {
+    let data = JSON.parse(localStorage.getItem("sebutharga_records") || "[]");
+
+    const index = data.findIndex(function (x) {
+      return String(x.id) === String(record.id);
+    });
+
+    if (index >= 0) {
+      data[index] = record;
+    } else {
+      data.unshift(record);
+    }
+
+    localStorage.setItem("sebutharga_records", JSON.stringify(data));
+  }
+
+  async function loadSebutharga() {
+    const tbody = document.getElementById("senaraiSebutharga");
+
+    if (IS_LOCAL) {
+      allSebutharga = JSON.parse(localStorage.getItem("sebutharga_records") || "[]");
+      renderSebuthargaTable(allSebutharga);
+      return;
+    }
+
+    try {
+      const url = `${APPS_SCRIPT_URL}?secret=${encodeURIComponent(SHEET_SECRET)}&action=sebutharga_list`;
+
+      const res = await fetch(url);
+      const result = await res.json();
+
+      if (!result.ok) {
+        throw new Error(result.error || "Gagal baca sebutharga.");
+      }
+
+      allSebutharga = result.data || [];
+      renderSebuthargaTable(allSebutharga);
+
+    } catch (err) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="10">Gagal load: ${escapeHtml(err.message)}</td>
+        </tr>
+      `;
+    }
+  }
+
+  function renderSebuthargaTable(data) {
+    const tbody = document.getElementById("senaraiSebutharga");
+
+    if (!data.length) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="10">Tiada sebutharga direkodkan.</td>
+        </tr>
+      `;
+      return;
+    }
+
+    let html = "";
+
+    data.forEach(function (d) {
+
+      if (!d.items || d.items.length === 0) {
+        html += `
+          <tr>
+            <td>${escapeHtml(d.id)}</td>
+            <td>${escapeHtml(d.no_sebutharga)}</td>
+            <td>${escapeHtml(d.tarikh)}</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>RM ${escapeHtml(d.grand_total || "0.00")}</td>
+            <td>${escapeHtml(d.cukai_percent || "0")}%</td>
+            <td>${escapeHtml(d.prepared_by)}</td>
+            <td>
+              <button class="btn-small btn-blue" onclick="editSebutharga('${escapeHtml(d.id)}')">
+                Edit
+              </button>
+
+              <button class="btn-small btn-red" onclick="deleteSebutharga('${escapeHtml(d.id)}')">
+                Delete
+              </button>
+            </td>
+          </tr>
+        `;
+      } 
+
+      else {
+
+        d.items.forEach(function(item, index) {
+
+          html += `
+            <tr>
+
+              <td>
+                ${index === 0 ? escapeHtml(d.id) : ""}
+              </td>
+
+              <td>
+                ${index === 0 ? escapeHtml(d.no_sebutharga) : ""}
+              </td>
+
+              <td>
+                ${index === 0 ? escapeHtml(d.tarikh) : ""}
+              </td>
+
+              <td>
+                ${escapeHtml(item.perihal || "")}
+              </td>
+
+              <td>
+                ${escapeHtml(item.kuantiti || "0")}
+              </td>
+
+              <td>
+                RM ${escapeHtml(item.harga_unit || "0.00")}
+              </td>
+
+              <td>
+                RM ${escapeHtml(item.jumlah || "0.00")}
+              </td>
+
+              <td>
+                ${index === 0 ? escapeHtml(d.cukai_percent || "0") + "%" : ""}
+              </td>
+
+              <td>
+                ${index === 0 ? escapeHtml(d.prepared_by) : ""}
+              </td>
+
+              <td>
+                ${index === 0 ? `
+                  <button class="btn-small btn-blue" onclick="editSebutharga('${escapeHtml(d.id)}')">
+                    Edit
+                  </button>
+
+                  <button class="btn-small btn-red" onclick="deleteSebutharga('${escapeHtml(d.id)}')">
+                    Delete
+                  </button>
+                ` : ""}
+              </td>
+
+            </tr>
+          `;
+
+        });
+
+      }
+
+    });
+
+
+    tbody.innerHTML = html;
+  }
+
+  function editSebutharga(id) {
+    const d = allSebutharga.find(function (x) {
+      return String(x.id) === String(id);
+    });
+
+    if (!d) {
+      alert("Data tidak dijumpai.");
+      return;
+    }
+
+    setField("edit_id", d.id);
+    setField("tarikh", toInputDate(d.tarikh));
+    setField("no_sebutharga", d.no_sebutharga);
+    setField("po_no", d.po_no);
+    setField("no_mof", d.no_mof);
+    setField("prepared_by", d.prepared_by);
+    setField("cukai_percent", d.cukai_percent || "0");
+    setField("grand_total", d.grand_total);
+
+    loadItemsToTable(d.items || []);
+
+    setMsg("Mode edit: " + d.id, "#2563eb");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function loadItemsToTable(items) {
+    const tbody = document.getElementById("itemBody");
+    tbody.innerHTML = "";
+
+    if (!items.length) {
+      tambahItem();
+      return;
+    }
+
+    items.forEach(function (item, index) {
+      const tr = document.createElement("tr");
+
+      tr.innerHTML = `
+        <td class="no-col">${index + 1}</td>
+        <td><textarea class="item-text">${escapeHtml(item.perihal || "")}</textarea></td>
+        <td><input type="number" min="0" value="${escapeHtml(item.kuantiti || "")}" oninput="kiraJumlah()"></td>
+        <td><input type="number" min="0" step="0.01" value="${escapeHtml(item.harga_unit || "")}" oninput="kiraJumlah()"></td>
+        <td><input readonly value="${escapeHtml(item.jumlah || "")}"></td>
+        <td class="action-buttons">
+          <button class="btn-small btn-red" onclick="padamItem(this)">Delete</button>
+        </td>
+      `;
+
+      tbody.appendChild(tr);
+    });
+
+    kiraJumlah();
+  }
+
+  async function deleteSebutharga(id) {
+    if (!confirm("Padam sebutharga ini?")) return;
+
+    try {
+      await sendToAppsScript({
+        action: "sebutharga_delete",
+        id: id
+      });
+
+      let data = JSON.parse(localStorage.getItem("sebutharga_records") || "[]");
+
+      data = data.filter(function (x) {
+        return String(x.id) !== String(id);
+      });
+
+      localStorage.setItem("sebutharga_records", JSON.stringify(data));
+
+      setMsg("Sebutharga berjaya dipadam.", "#16a34a");
+      loadSebutharga();
+
+    } catch (err) {
+      setMsg("Gagal delete: " + err.message, "#dc2626");
+    }
+  }
+
+  function resetFormOnly() {
+    setField("edit_id", "");
+    setField("no_sebutharga", "");
+    setField("po_no", "");
+    setField("no_mof", "");
+    setField("prepared_by", "");
+    setField("cukai_percent", "0");
+    setField("subtotal", "0.00");
+    setField("cukai_amaun", "0.00");
+    setField("grand_total", "0.00");
+
+    const tarikh = document.getElementById("tarikh");
+    if (tarikh) tarikh.valueAsDate = new Date();
+
+    const tbody = document.getElementById("itemBody");
+    tbody.innerHTML = "";
+    tambahItem();
+    kiraJumlah();
+  }
+
+  function resetPage() {
+    if (!confirm("Reset form sahaja?")) return;
+    resetFormOnly();
+    setMsg("", "#0f172a");
+  }
+
+  function toInputDate(value) {
+    if (!value) return "";
+
+    try {
+      const d = new Date(value);
+      if (isNaN(d.getTime())) return String(value).slice(0, 10);
+      return d.toISOString().slice(0, 10);
+    } catch {
+      return "";
+    }
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? "").replace(/[&<>'"]/g, function (char) {
+      return {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "'": "&#039;",
+        '"': "&quot;"
+      }[char];
+    });
+  }
+</script>
+
+</body>
+</html>
