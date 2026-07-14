@@ -887,11 +887,12 @@ tbody tr:last-child td{border-bottom:none;}
     const level = getTahapLevel(tahap); // 1=Draf, 2=Kemaskini, 3=Selesai
     const steps = ["Draf", "Kemaskini", "Selesai"];
 
-    // kelas untuk setiap node: 'done' jika sudah dilepasi, 'active' jika tahap semasa
+    // kelas untuk setiap node: 'done' jika sudah dilepasi ATAU tahap akhir tercapai, 'active' jika tahap semasa dan masih ada tahap seterusnya
     function nodeClass(i) {
       const n = i + 1;
+      const isLast = i === steps.length - 1;
       if (n < level) return "done";
-      if (n === level) return "active";
+      if (n === level) return isLast ? "done" : "active";
       return "";
     }
     // kelas untuk penyambung antara node i dan i+1
@@ -928,8 +929,9 @@ tbody tr:last-child td{border-bottom:none;}
 
     function nodeClass(i) {
       const n = i + 1;
+      const isLast = i === steps.length - 1;
       if (n < level) return "done";
-      if (n === level) return "active";
+      if (n === level) return isLast ? "done" : "active";
       return "";
     }
     function linkClass(i) {
