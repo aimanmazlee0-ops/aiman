@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PKPJ - Sistem Pengurusan Stok</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0f1419;
+      --bg-elev: #1a1f28;
+      --bg-elev-2: #242b37;
+      --panel: #2d3541;
+      --panel-border: #3d4452;
+      --gold-deep: #8b6f47;
+      --gold-mid: #ccab6c;
+      --gold-pale: #f5e6d3;
+      --text: #e4e4e7;
+      --text-dim: #a1a1aa;
+      --text-faint: #71717a;
+      --ok: #16a34a;
+      --ok-bg: rgba(22, 163, 74, .08);
+      --err: #dc2626;
+      --info: #0ea5e9;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    /* Video Background */
+    .video-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 0;
+    }
+
+    .video-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 50% 50%, rgba(15, 20, 25, .40), rgba(15, 20, 25, .75));
+      z-index: 1;
+    }
+
+    /* Container */
+    .container {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+      animation: fadeInDown .6s ease;
+    }
+
+    .logo {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, var(--gold-pale), var(--gold-mid));
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 32px;
+      font-weight: 800;
+      color: #241c07;
+      box-shadow: 0 12px 28px rgba(204, 171, 108, .25);
+      transition: .3s;
+    }
+
+    .logo:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 18px 40px rgba(204, 171, 108, .35);
+    }
+
+    .header h1 {
+      font-family: 'Fraunces', serif;
+      font-size: 42px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, var(--gold-pale), var(--gold-mid));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header p {
+      font-size: 15px;
+      color: var(--text-dim);
+      letter-spacing: .5px;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    /* Login Box */
+    .login-box {
+      background: var(--bg-elev-2);
+      border: 1px solid var(--panel-border);
+      border-radius: 18px;
+      padding: 40px 36px;
+      width: 100%;
+      max-width: 380px;
+      animation: fadeInUp .6s ease .15s both;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, .6);
+    }
+
+    .login-box h2 {
+      font-family: 'Fraunces', serif;
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .login-box .subtitle {
+      font-size: 12px;
+      color: var(--text-faint);
+      letter-spacing: .4px;
+      text-transform: uppercase;
+      margin-bottom: 28px;
+      font-weight: 700;
+    }
+
+    /* Form Group */
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .4px;
+      text-transform: uppercase;
+      color: var(--text-faint);
+      margin-bottom: 8px;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 13px 16px;
+      background: var(--bg-elev);
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 14px;
+      color: var(--text);
+      transition: .2s;
+      font-weight: 500;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--gold-mid);
+      box-shadow: 0 0 0 3px rgba(204, 171, 108, .15);
+      background: var(--panel);
+    }
+
+    .form-group input::placeholder {
+      color: var(--text-faint);
+    }
+
+    /* Button */
+    .btn-login {
+      width: 100%;
+      padding: 14px 20px;
+      background: linear-gradient(135deg, var(--gold-pale), var(--gold-mid));
+      border: none;
+      border-radius: 12px;
+      font-family: 'Fraunces', serif;
+      font-size: 15px;
+      font-weight: 800;
+      color: #241c07;
+      cursor: pointer;
+      transition: .3s;
+      letter-spacing: .3px;
+      margin-top: 8px;
+    }
+
+    .btn-login:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px rgba(204, 171, 108, .35);
+    }
+
+    .btn-login:active {
+      transform: translateY(0);
+    }
+
+    .btn-login:disabled {
+      opacity: .6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Error Message */
+    .error-msg {
+      font-size: 12px;
+      color: var(--err);
+      margin-top: 6px;
+      display: none;
+      padding: 8px 12px;
+      background: rgba(220, 38, 38, .1);
+      border-radius: 8px;
+      border-left: 3px solid var(--err);
+    }
+
+    .error-msg.show {
+      display: block;
+      animation: slideIn .3s ease;
+    }
+
+    /* Footer */
+    .footer {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      right: 20px;
+      font-size: 11px;
+      color: var(--text-faint);
+      text-align: center;
+      z-index: 2;
+      letter-spacing: .4px;
+    }
+
+    /* Animations */
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 520px) {
+      .header h1 {
+        font-size: 32px;
+      }
+
+      .login-box {
+        padding: 32px 24px;
+      }
+
+      .logo {
+        width: 70px;
+        height: 70px;
+        font-size: 28px;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .header h1 {
+        font-size: 26px;
+      }
+
+      .login-box {
+        max-width: 100%;
+        padding: 28px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Video Background -->
+  <video class="video-bg" autoplay muted loop playsinline>
+    <source src="video_pkpj.mp4" type="video/mp4">
+    <!-- Fallback: solid background jika video tak dimainkan -->
+  </video>
+  <div class="video-overlay"></div>
+
+  <!-- Main Container -->
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="logo">📦</div>
+      <h1>PKPJ</h1>
+      <p>Sistem Pengurusan Stok</p>
+    </div>
+
+    <!-- Login Box -->
+    <div class="login-box">
+      <h2>Masuk</h2>
+      <p class="subtitle">Sistem Manajemen Stok & Aset</p>
+
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label for="username">Nama / Username</label>
+          <input 
+            type="text" 
+            id="username" 
+            placeholder="Masukkan nama anda" 
+            required 
+            autocomplete="off"
+          >
+        </div>
+
+        <button type="submit" class="btn-login">Masuk ke Sistem</button>
+
+        <div class="error-msg" id="errorMsg"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <p>PKPJ © 2026 | Sistem Pengurusan Stok & Aset Kerajaan</p>
+  </div>
+
+  <script>
+    // Handle login
+    function handleLogin(event) {
+      event.preventDefault();
+
+      const username = document.getElementById('username').value.trim();
+      const errorMsg = document.getElementById('errorMsg');
+      const btn = event.target.querySelector('button');
+
+      // Clear error
+      errorMsg.classList.remove('show');
+      errorMsg.textContent = '';
+
+      // Validate
+      if (!username) {
+        errorMsg.textContent = 'Sila masukkan nama anda.';
+        errorMsg.classList.add('show');
+        return;
+      }
+
+      if (username.length < 2) {
+        errorMsg.textContent = 'Nama mesti sekurang-kurangnya 2 huruf.';
+        errorMsg.classList.add('show');
+        return;
+      }
+
+      // Save to localStorage dan redirect
+      btn.disabled = true;
+      btn.textContent = 'Sedang masuk...';
+
+      setTimeout(function () {
+        localStorage.setItem('pkpj_user', username);
+        localStorage.setItem('pkpj_login_time', new Date().toISOString());
+        
+        // Redirect ke index
+        window.location.href = 'index.html';
+      }, 600);
+    }
+
+    // Check if already logged in
+    window.addEventListener('DOMContentLoaded', function () {
+      const user = localStorage.getItem('pkpj_user');
+      if (user) {
+        // Redirect terus ke index kalau dah login
+        window.location.href = 'index.html';
+      }
+
+      // Auto focus input
+      document.getElementById('username').focus();
+    });
+
+    // Allow Enter key
+    document.getElementById('username').addEventListener('keypress', function (e) {
+      if (e.key === 'Enter') {
+        document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+      }
+    });
+  </script>
+
+</body>
+</html>
