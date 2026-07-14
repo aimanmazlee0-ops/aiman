@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kelulusan Pegawai - PKPJ</title>
+
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap');
+
+:root{
+  --gold-pale:#FEDEA0;
+  --gold-mid:#CCAB6C;
+  --gold-deep:#B38922;
+  --ink:#34312F;
+
+  --bg:#100e0c;
+  --bg-elev:#1a1712;
+  --bg-elev-2:#221e17;
+  --panel:#181410;
+  --panel-border:#332c20;
+  --text:#f3ead6;
+  --text-dim:#a89a7d;
+  --text-faint:#6f6552;
+  --ok:#6fbf8b; --ok-bg:rgba(111,191,139,.12);
+  --err:#e08a6f; --err-bg:rgba(224,138,111,.12);
+  --info:#7fa8e0; --info-bg:rgba(127,168,224,.12);
+  --shadow-soft:0 20px 50px -24px rgba(0,0,0,.65);
+  color-scheme: dark;
+}
+[data-theme="light"]{
+  --bg:#f6efdd;
+  --bg-elev:#fffaf0;
+  --bg-elev-2:#fbf3df;
+  --panel:#fffdf8;
+  --panel-border:#e7d9b6;
+  --text:#2b2416;
+  --text-dim:#7a6a45;
+  --text-faint:#a7996f;
+  --ok:#1f7a4d; --ok-bg:#e4f4ea;
+  --err:#b5442e; --err-bg:#fbeae5;
+  --info:#1d4ed8; --info-bg:#e6edfc;
+  --shadow-soft:0 20px 44px -26px rgba(90,70,20,.35);
+  color-scheme: light;
+}
+
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:'Manrope',-apple-system,BlinkMacSystemFont,sans-serif;
+  background:
+    radial-gradient(900px 420px at 88% -8%, rgba(204,171,108,.16), transparent 60%),
+    radial-gradient(700px 420px at -8% 108%, rgba(179,137,34,.10), transparent 60%),
+    var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  transition:background .35s ease,color .35s ease;
+}
+h1,h2,h3{font-family:'Fraunces',serif;letter-spacing:.2px;margin:0;}
+p{color:var(--text-dim);}
+::selection{background:var(--gold-deep);color:#100e0c;}
+
+.app{display:flex;min-height:100vh;}
+.sidebar{
+  width:236px;flex-shrink:0;padding:26px 18px;
+  background:linear-gradient(175deg,var(--bg-elev) 0%, var(--bg) 120%);
+  border-right:1px solid var(--panel-border);
+  position:fixed;top:0;bottom:0;left:0;overflow-y:auto;
+  display:flex;flex-direction:column;gap:26px;
+}
+.brand{display:flex;align-items:center;gap:12px;}
+.brand-logo{
+  width:44px;height:44px;border-radius:12px;flex-shrink:0;
+  background:linear-gradient(140deg,var(--gold-pale),var(--gold-mid) 55%,var(--gold-deep));
+  color:#241c07;font-weight:800;font-family:'Fraunces',serif;font-size:14px;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 8px 18px -6px rgba(179,137,34,.55);
+}
+.brand h2{font-size:16px;font-weight:600;color:var(--text);margin:0;font-family:'Fraunces',serif;}
+.brand p{margin:3px 0 0;font-size:10.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--text-faint);}
+
+.menu{display:flex;flex-direction:column;gap:5px;}
+.menu a{
+  display:flex;align-items:center;gap:10px;text-decoration:none;
+  color:var(--text-dim);font-size:13px;font-weight:600;
+  padding:11px 13px;border-radius:11px;border:1px solid transparent;transition:.2s;
+}
+.menu a .dot{width:6px;height:6px;border-radius:50%;background:var(--text-faint);flex-shrink:0;}
+.menu a:hover{background:var(--panel);border-color:var(--panel-border);color:var(--text);}
+.menu a.active{background:linear-gradient(135deg,var(--gold-pale),var(--gold-mid));color:#241c07;box-shadow:var(--shadow-soft);}
+.menu a.active .dot{background:#241c07;}
+
+.sidebar-foot{margin-top:auto;padding-top:16px;border-top:1px solid var(--panel-border);}
+.theme-toggle{
+  width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;
+  background:var(--panel);border:1px solid var(--panel-border);color:var(--text);
+  padding:10px 12px;border-radius:12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;
+}
+.theme-toggle .knob{width:34px;height:18px;border-radius:999px;background:var(--panel-border);position:relative;transition:.25s;}
+.theme-toggle .knob::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--gold-mid);transition:.25s;}
+[data-theme="light"] .theme-toggle .knob::after{left:18px;background:var(--gold-deep);}
+
+.main{margin-left:236px;width:calc(100% - 236px);padding:30px 34px 60px;max-width:1220px;}
+
+.hero{
+  background:linear-gradient(150deg,var(--bg-elev) 0%,var(--bg-elev-2) 100%);
+  border:1px solid var(--panel-border);
+  color:var(--text);border-radius:20px;padding:26px 28px;margin-bottom:22px;
+  box-shadow:var(--shadow-soft);position:relative;overflow:hidden;
+}
+.hero::after{content:"";position:absolute;right:-40px;top:-40px;width:150px;height:150px;border-radius:50%;
+  background:radial-gradient(circle,rgba(204,171,108,.22),transparent 70%);}
+.hero h1{margin:0;font-size:27px;font-weight:600;}
+.hero p{margin:8px 0 0;color:var(--text-dim);}
+
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:22px;}
+button{border:none;cursor:pointer;font-weight:700;border-radius:11px;padding:11px 17px;font-size:12.8px;transition:.2s;letter-spacing:.2px;font-family:inherit;}
+button:hover{transform:translateY(-1px);}
+button:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+.btn-primary{background:linear-gradient(135deg,var(--gold-pale),var(--gold-mid));color:#241c07;box-shadow:0 10px 20px -8px rgba(179,137,34,.55);}
+.btn-blue{background:var(--info);color:#0d1930;}
+.btn-green{background:var(--ok);color:#0e1a13;}
+.btn-red{background:var(--err);color:#2b0e07;}
+.btn-gray{background:var(--bg-elev-2);color:var(--text-dim);border:1px solid var(--panel-border);}
+.btn-small{padding:7px 11px;font-size:11px;border-radius:8px;}
+
+.card{
+  background:linear-gradient(165deg,var(--bg-elev),var(--bg-elev-2));
+  border:1px solid var(--panel-border);border-radius:18px;
+  padding:22px 24px;margin-bottom:20px;box-shadow:var(--shadow-soft);
+}
+.card h2{margin:0 0 16px;font-size:17px;font-weight:600;color:var(--text);}
+
+label{display:block;font-size:11px;font-weight:700;margin-bottom:6px;color:var(--text-dim);letter-spacing:.2px;}
+input,select{
+  width:100%;padding:10px 12px;border:1px solid var(--panel-border);border-radius:10px;font-size:13.4px;outline:none;
+  background:var(--bg-elev-2);font-family:inherit;color:var(--text);transition:.2s;
+}
+input:focus,select:focus{border-color:var(--gold-mid);box-shadow:0 0 0 3px rgba(204,171,108,.18);}
+.search{width:100%;}
+
+.table-wrap{overflow-x:auto;border-radius:14px;border:1px solid var(--panel-border);}
+table{width:100%;border-collapse:collapse;}
+thead tr{background:var(--bg-elev-2);}
+th{color:var(--gold-mid);font-size:10px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;padding:11px 10px;text-align:left;white-space:nowrap;}
+td{border-bottom:1px solid var(--panel-border);padding:9px 10px;font-size:12.6px;vertical-align:middle;color:var(--text);}
+tbody tr:hover{background:var(--bg-elev-2);}
+tbody tr:last-child td{border-bottom:none;}
+.kosong{text-align:center;color:var(--text-faint);padding:24px 10px !important;font-style:italic;}
+
+.status,.badge{display:inline-block;padding:5px 11px;border-radius:999px;font-size:10.5px;font-weight:800;letter-spacing:.3px;}
+.badge-draf{background:var(--info-bg);color:var(--info);}
+.badge-kemaskini{background:rgba(204,171,108,.18);color:var(--gold-mid);}
+.badge-selesai{background:var(--ok-bg);color:var(--ok);}
+.badge-source{background:var(--bg-elev-2);color:var(--gold-mid);border:1px solid var(--panel-border);}
+
+.summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;}
+.summary-card{
+  background:linear-gradient(165deg,var(--bg-elev),var(--bg-elev-2));
+  border:1px solid var(--panel-border);border-radius:18px;padding:18px 18px 16px;
+  box-shadow:var(--shadow-soft);position:relative;overflow:hidden;
+}
+.summary-card::after{content:"";position:absolute;right:-30px;top:-30px;width:100px;height:100px;border-radius:50%;
+  background:radial-gradient(circle,rgba(204,171,108,.20),transparent 70%);}
+.summary-card .label{font-size:10.5px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--text-faint);}
+.summary-card .value{font-family:'Fraunces',serif;font-size:30px;font-weight:600;color:var(--text);margin-top:6px;}
+
+.filter-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px;margin-bottom:16px;}
+
+.approve-actions{display:flex;gap:6px;flex-wrap:wrap;}
+
+.msg{margin-top:14px;padding:11px 14px;border-radius:10px;font-weight:700;font-size:12.3px;display:none;}
+.msg.show{display:block;}
+.msg.ok{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok);}
+.msg.err{background:var(--err-bg);color:var(--err);border:1px solid var(--err);}
+
+.toast-stack{position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:9px;max-width:320px;}
+.toast{display:flex;align-items:flex-start;gap:9px;background:var(--bg-elev);color:var(--text);padding:13px 15px;border-radius:13px;box-shadow:0 18px 40px -14px rgba(0,0,0,.5);border-left:4px solid var(--gold-mid);font-size:12.6px;font-weight:600;line-height:1.4;transform:translateX(120%);opacity:0;animation:toastIn .45s cubic-bezier(.2,.9,.3,1.3) forwards;}
+.toast.err{border-left-color:var(--err);}
+.toast .icn{font-size:16px;line-height:1;margin-top:1px;}
+.toast.leaving{animation:toastOut .35s ease forwards;}
+@keyframes toastIn{to{transform:translateX(0);opacity:1;}}
+@keyframes toastOut{to{transform:translateX(120%);opacity:0;}}
+
+.saving-overlay{
+  display:none;position:fixed;inset:0;background:rgba(8,7,5,.55);
+  backdrop-filter:blur(2px);
+  align-items:center;justify-content:center;z-index:10000;padding:20px;
+}
+.saving-overlay.show{display:flex;}
+.saving-box{
+  background:var(--bg-elev);border:1px solid var(--panel-border);border-radius:18px;
+  padding:30px 34px;box-shadow:0 30px 70px -20px rgba(0,0,0,.6);
+  color:var(--text);text-align:center;min-width:220px;
+}
+.saving-spinner{
+  width:46px;height:46px;border:5px solid var(--panel-border);
+  border-top-color:var(--gold-mid);border-right-color:var(--gold-pale);
+  border-radius:50%;animation:spin .85s linear infinite;margin:0 auto 16px;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+.saving-title{font-weight:700;margin-bottom:4px;font-size:14px;color:var(--text);}
+.saving-text{font-size:12.5px;color:var(--text-dim);}
+
+@media(max-width:900px){
+  .summary-grid{grid-template-columns:repeat(2,1fr);}
+  .filter-grid{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:760px){
+  .sidebar{width:100%;position:relative;height:auto;padding:16px;}
+  .app{flex-direction:column;}
+  .main{margin-left:0;width:100%;padding:18px;}
+  .summary-grid{grid-template-columns:1fr 1fr;}
+  .filter-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+
+<body>
+<script>
+(function () {
+  function safeGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function safeSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  function applyTheme(mode) {
+    document.body.setAttribute("data-theme", mode);
+    const label = document.getElementById("themeToggleLabel");
+    if (label) label.textContent = mode === "dark" ? "Mod Gelap" : "Mod Terang";
+    safeSet("pkpj_theme", mode);
+  }
+  window.toggleTheme = function () {
+    const cur = document.body.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    applyTheme(cur);
+  };
+  document.addEventListener("DOMContentLoaded", function () {
+    applyTheme(safeGet("pkpj_theme") || "dark");
+  });
+})();
+</script>
+
+<div class="toast-stack" id="toastStack"></div>
+
+<div class="saving-overlay" id="savingOverlay">
+  <div class="saving-box">
+    <div class="saving-spinner"></div>
+    <div class="saving-title" id="savingTitle">Sedang diproses...</div>
+    <div class="saving-text" id="savingText">Sila tunggu sebentar</div>
+  </div>
+</div>
+
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-logo">PKPJ</div>
+      <div>
+        <h2>PKPJ Sistem</h2>
+        <p>Pengurusan Stok</p>
+      </div>
+    </div>
+
+    <nav class="menu">
+      <a href="index.html"><span class="dot"></span>Borang Permohonan</a>
+      <a href="pesanan.html"><span class="dot"></span>Pesanan Kerajaan</a>
+      <a href="sebutharga.html"><span class="dot"></span>Perincian Bekalan</a>
+      <a href="sejarah_pergerakan.html"><span class="dot"></span>Sejarah Pergerakan</a>
+      <a href="pegawai_stor.html"><span class="dot"></span>Pegawai Stor</a>
+      <a href="ringkasan_aset.html"><span class="dot"></span>Ringkasan Aset</a>
+      <a href="kelulusan_pegawai.html" class="active"><span class="dot"></span>Kelulusan Pegawai</a>
+    </nav>
+    <div class="sidebar-foot">
+      <button class="theme-toggle" id="themeToggleBtn" onclick="toggleTheme()">
+        <span id="themeToggleLabel">Mod Gelap</span>
+        <span class="knob"></span>
+      </button>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <section class="hero">
+      <h1>Kelulusan Pegawai</h1>
+      <p>Semak dan luluskan pergerakan rekod dari Draf → Kemaskini → Selesai untuk Pesanan Kerajaan dan Sebutharga.</p>
+    </section>
+
+    <div class="toolbar">
+      <button class="btn-primary" onclick="loadSemua()">Refresh Data</button>
+      <button class="btn-gray" onclick="resetFilter()">Reset Filter</button>
+    </div>
+
+    <section class="summary-grid">
+      <div class="summary-card">
+        <div class="label">Jumlah Rekod</div>
+        <div class="value" id="countTotal">0</div>
+      </div>
+      <div class="summary-card">
+        <div class="label">Draf</div>
+        <div class="value" id="countDraf">0</div>
+      </div>
+      <div class="summary-card">
+        <div class="label">Kemaskini</div>
+        <div class="value" id="countKemaskini">0</div>
+      </div>
+      <div class="summary-card">
+        <div class="label">Selesai</div>
+        <div class="value" id="countSelesai">0</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Senarai Rekod Untuk Kelulusan</h2>
+
+      <div class="filter-grid">
+        <input id="searchInput" type="text" placeholder="Cari no dokumen / pihak..." oninput="applyFilter()">
+
+        <select id="sourceFilter" onchange="applyFilter()">
+          <option value="">Semua Modul</option>
+          <option value="Pesanan Kerajaan">Pesanan Kerajaan</option>
+          <option value="Sebutharga">Sebutharga</option>
+        </select>
+
+        <select id="stageFilter" onchange="applyFilter()">
+          <option value="">Semua Tahap</option>
+          <option value="DRAF">Draf</option>
+          <option value="KEMASKINI">Kemaskini</option>
+          <option value="SELESAI">Selesai</option>
+        </select>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Modul</th>
+              <th>No Dokumen</th>
+              <th>Pihak</th>
+              <th>Tarikh</th>
+              <th>Amaun</th>
+              <th>Tahap Semasa</th>
+              <th>Tindakan Kelulusan</th>
+            </tr>
+          </thead>
+          <tbody id="recordBody">
+            <tr><td colspan="7">Memuatkan data...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div id="msg" class="msg"></div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyLsu4ZUtYEO5lhbKWW-VVPEaxvAKlOuAz5X7XppNHdX0lBHoh9273DdBMGNTbrcM4I/exec";
+  const SHEET_SECRET = "pkpj-secret-123";
+
+  let allRecords = [];
+  let filteredRecords = [];
+
+  document.addEventListener("DOMContentLoaded", function () {
+    loadSemua();
+  });
+
+  function showSaving(title, text) {
+    document.getElementById("savingTitle").textContent = title || "Sedang diproses...";
+    document.getElementById("savingText").textContent = text || "Sila tunggu sebentar";
+    document.getElementById("savingOverlay").classList.add("show");
+  }
+  function hideSaving() {
+    document.getElementById("savingOverlay").classList.remove("show");
+  }
+
+  function showToast(text, ok) {
+    const stack = document.getElementById("toastStack");
+    const t = document.createElement("div");
+    t.className = "toast" + (ok ? "" : " err");
+    t.innerHTML = '<span class="icn">' + (ok ? "✓" : "⚠") + '</span><span>' + escapeHtml(text) + '</span>';
+    stack.appendChild(t);
+    setTimeout(function () {
+      t.classList.add("leaving");
+      setTimeout(function () { t.remove(); }, 350);
+    }, 3200);
+  }
+
+  function setMsg(text, ok) {
+    const el = document.getElementById("msg");
+    el.textContent = text || "";
+    el.className = "msg" + (text ? " show " + (ok ? "ok" : "err") : "");
+  }
+
+  async function readJson(response) {
+    const text = await response.text();
+    try {
+      return JSON.parse(text);
+    } catch (err) {
+      throw new Error("Apps Script tidak pulangkan JSON. Response: " + text.substring(0, 160));
+    }
+  }
+
+  async function fetchList(action) {
+    let url = APPS_SCRIPT_URL + "?secret=" + encodeURIComponent(SHEET_SECRET);
+    if (action) url += "&action=" + encodeURIComponent(action);
+    const res = await fetch(url);
+    const result = await readJson(res);
+    if (!result.ok) throw new Error(result.error || "Gagal baca data.");
+    return result.data || [];
+  }
+
+  function normalizeTahap(status) {
+    const s = String(status || "").toUpperCase().trim();
+    if (["SELESAI", "DITERIMA", "DILULUSKAN", "LULUS", "APPROVED", "COMPLETE", "COMPLETED"].includes(s)) {
+      return "SELESAI";
+    }
+    if (["KEMASKINI", "DIKEMASKINI", "DIHANTAR", "DALAM PROSES", "PROSES", "PROCESSING", "DITOLAK"].includes(s)) {
+      return "KEMASKINI";
+    }
+    return "DRAF";
+  }
+
+  // Tahap paparan dipetakan semula kepada status sebenar yang disimpan di Sheet,
+  // supaya setiap modul (Pesanan / Sebutharga) simpan nilai status yang mereka faham.
+  function tahapToStoredStatus(tahap) {
+    if (tahap === "SELESAI") return "SELESAI";
+    if (tahap === "KEMASKINI") return "DIHANTAR";
+    return "DRAF";
+  }
+
+  function nextTahap(tahap) {
+    if (tahap === "DRAF") return "KEMASKINI";
+    if (tahap === "KEMASKINI") return "SELESAI";
+    return null;
+  }
+
+  function loadSemua() {
+    const tbody = document.getElementById("recordBody");
+    setMsg("Sedang memuatkan rekod...", true);
+    tbody.innerHTML = '<tr><td colspan="7">Memuatkan data...</td></tr>';
+
+    Promise.all([fetchList("pesanan_list"), fetchList("sebutharga_list")])
+      .then(function (results) {
+        const pesanan = results[0];
+        const sebutharga = results[1];
+
+        allRecords = [];
+
+        pesanan.forEach(function (d) {
+          allRecords.push({
+            source: "Pesanan Kerajaan",
+            id: d.id,
+            ref: d.no_dokumen || d.id || "-",
+            pihak: d.pembekal || d.penyedia || "-",
+            tarikh: d.tarikh_dokumen || d.created_at || "",
+            amaun: d.jumlah_keseluruhan || "0.00",
+            statusAsal: d.status || "DRAF",
+            tahap: normalizeTahap(d.status),
+            raw: d
+          });
+        });
+
+        sebutharga.forEach(function (d) {
+          allRecords.push({
+            source: "Sebutharga",
+            id: d.id,
+            ref: d.no_sebutharga || d.id || "-",
+            pihak: d.prepared_by || "-",
+            tarikh: d.tarikh || "",
+            amaun: d.grand_total || "0.00",
+            statusAsal: d.status || "DRAF",
+            tahap: normalizeTahap(d.status),
+            raw: d
+          });
+        });
+
+        applyFilter();
+        setMsg("Data berjaya dimuatkan.", true);
+        showToast("Data berjaya dimuatkan.", true);
+      })
+      .catch(function (err) {
+        tbody.innerHTML = '<tr><td colspan="7">Gagal load: ' + escapeHtml(err.message) + '</td></tr>';
+        setMsg("Gagal load: " + err.message, false);
+        showToast("Gagal load: " + err.message, false);
+      });
+  }
+
+  function applyFilter() {
+    const search = String(document.getElementById("searchInput").value || "").toLowerCase().trim();
+    const source = document.getElementById("sourceFilter").value;
+    const stage = document.getElementById("stageFilter").value;
+
+    filteredRecords = allRecords.filter(function (row) {
+      const matchSearch = !search ||
+        String(row.ref || "").toLowerCase().includes(search) ||
+        String(row.pihak || "").toLowerCase().includes(search);
+      const matchSource = !source || row.source === source;
+      const matchStage = !stage || row.tahap === stage;
+      return matchSearch && matchSource && matchStage;
+    });
+
+    renderTable(filteredRecords);
+    updateSummary(filteredRecords);
+  }
+
+  function resetFilter() {
+    document.getElementById("searchInput").value = "";
+    document.getElementById("sourceFilter").value = "";
+    document.getElementById("stageFilter").value = "";
+    applyFilter();
+  }
+
+  function renderTable(data) {
+    const tbody = document.getElementById("recordBody");
+
+    if (!data.length) {
+      tbody.innerHTML = '<tr><td colspan="7" class="kosong">Tiada rekod dijumpai.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = data.map(function (row, index) {
+      const next = nextTahap(row.tahap);
+      let actionsHtml = "";
+
+      if (next) {
+        actionsHtml += `<button class="btn-small btn-green" onclick="approveRecord(${index})">Lulus ke ${next === "KEMASKINI" ? "Kemaskini" : "Selesai"}</button>`;
+      } else {
+        actionsHtml += `<span style="color:var(--text-faint);font-size:11px;">Sudah selesai</span>`;
+      }
+
+      if (row.tahap !== "DRAF") {
+        actionsHtml += ` <button class="btn-small btn-gray" onclick="revertRecord(${index})">Undur ke Draf</button>`;
+      }
+
+      return `
+        <tr>
+          <td><span class="badge badge-source">${escapeHtml(row.source)}</span></td>
+          <td>${escapeHtml(row.ref)}</td>
+          <td>${escapeHtml(shortText(row.pihak, 40))}</td>
+          <td>${formatDate(row.tarikh)}</td>
+          <td>RM ${escapeHtml(formatMoney(row.amaun))}</td>
+          <td>${renderTahapBadge(row.tahap)}</td>
+          <td class="approve-actions">${actionsHtml}</td>
+        </tr>
+      `;
+    }).join("");
+  }
+
+  function renderTahapBadge(tahap) {
+    if (tahap === "SELESAI") return '<span class="badge badge-selesai">SELESAI</span>';
+    if (tahap === "KEMASKINI") return '<span class="badge badge-kemaskini">KEMASKINI</span>';
+    return '<span class="badge badge-draf">DRAF</span>';
+  }
+
+  function updateSummary(data) {
+    const total = data.length;
+    const draf = data.filter(function (x) { return x.tahap === "DRAF"; }).length;
+    const kemaskini = data.filter(function (x) { return x.tahap === "KEMASKINI"; }).length;
+    const selesai = data.filter(function (x) { return x.tahap === "SELESAI"; }).length;
+
+    document.getElementById("countTotal").innerText = total;
+    document.getElementById("countDraf").innerText = draf;
+    document.getElementById("countKemaskini").innerText = kemaskini;
+    document.getElementById("countSelesai").innerText = selesai;
+  }
+
+  // Luluskan rekod ke tahap seterusnya. Kita hantar semula keseluruhan
+  // rekod asal (raw) dengan medan "status" sahaja yang diubah, supaya
+  // data lain (items, gambar dsb) di Google Sheet tidak hilang.
+  async function approveRecord(index) {
+    const row = filteredRecords[index];
+    if (!row) return;
+
+    const next = nextTahap(row.tahap);
+    if (!next) return;
+
+    await updateRecordStatus(row, next);
+  }
+
+  async function revertRecord(index) {
+    const row = filteredRecords[index];
+    if (!row) return;
+
+    if (!confirm("Undur rekod ini kembali ke peringkat Draf?")) return;
+
+    await updateRecordStatus(row, "DRAF");
+  }
+
+  async function updateRecordStatus(row, newTahap) {
+    const newStatus = tahapToStoredStatus(newTahap);
+
+    const payload = Object.assign({}, row.raw, {
+      secret: SHEET_SECRET,
+      action: row.source === "Pesanan Kerajaan" ? "pesanan_update" : "sebutharga_update",
+      id: row.id,
+      status: newStatus
+    });
+
+    showSaving("Mengemaskini status...", "Rekod " + row.ref + " sedang dikemaskini.");
+
+    try {
+      const res = await fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      });
+
+      const result = await readJson(res);
+
+      if (!result.ok) {
+        throw new Error(result.error || "Gagal kemaskini status.");
+      }
+
+      showToast("Rekod " + row.ref + " berjaya dikemaskini ke " + newTahap + ".", true);
+      setMsg("Rekod " + row.ref + " berjaya dikemaskini ke " + newTahap + ".", true);
+
+      await loadSemuaAsync();
+
+    } catch (err) {
+      showToast("Gagal: " + err.message, false);
+      setMsg("Gagal: " + err.message, false);
+    } finally {
+      hideSaving();
+    }
+  }
+
+  function loadSemuaAsync() {
+    return new Promise(function (resolve) {
+      loadSemua();
+      // loadSemua sendiri async melalui Promise.all didalamnya; beri sedikit masa
+      // supaya UI sempat refresh sebelum overlay saving ditutup.
+      setTimeout(resolve, 300);
+    });
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? "").replace(/[&<>'"]/g, function (char) {
+      return {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "'": "&#039;",
+        '"': "&quot;"
+      }[char];
+    });
+  }
+
+  function shortText(value, max) {
+    const text = String(value || "");
+    return text.length <= max ? text : text.slice(0, max) + "...";
+  }
+
+  function formatDate(value) {
+    if (!value) return "-";
+    try {
+      const d = new Date(value);
+      if (isNaN(d.getTime())) return escapeHtml(value);
+      return d.toLocaleDateString("ms-MY");
+    } catch (err) {
+      return escapeHtml(value);
+    }
+  }
+
+  function formatMoney(value) {
+    const n = Number(String(value || "0").replace(/[^0-9.-]/g, ""));
+    if (isNaN(n)) return "0.00";
+    return n.toFixed(2);
+  }
+</script>
+
+</body>
+</html>
