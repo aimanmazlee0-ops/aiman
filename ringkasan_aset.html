@@ -6,7 +6,7 @@
 <title>Ringkasan Aset - PKPJ</title>
 
 <style>
-@import url('https://script.google.com/macros/s/AKfycbyLsu4ZUtYEO5lhbKWW-VVPEaxvAKlOuAz5X7XppNHdX0lBHoh9273DdBMGNTbrcM4I/exec');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap');
 
 /* ============================================================
    PKPJ SHARED THEME — gold-on-charcoal design system
@@ -246,9 +246,24 @@ tbody tr:last-child td{border-bottom:none;}
   color:var(--text);text-align:center;
 }
 .modal-close{margin-top:16px;width:100%;background:var(--bg-elev-2);color:var(--text-dim);border:1px solid var(--panel-border);}
-.modal-img{width:100%;max-height:220px;object-fit:cover;border-radius:12px;margin-bottom:12px;background:var(--bg-elev-2);}
+.modal-img{
+  width:220px;height:220px;max-width:100%;object-fit:cover;object-position:center;
+  border-radius:14px;margin:0 auto 14px;background:var(--bg-elev-2);
+  border:1px solid var(--panel-border);overflow:hidden;display:flex;align-items:center;justify-content:center;
+}
+.modal-img img{width:100%;height:100%;object-fit:cover;object-position:center;display:block;}
+.modal-img .noimg{width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--text-faint);font-size:12px;}
 .modal-tag{display:inline-block;font-size:10.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--gold-mid);background:var(--bg-elev-2);border:1px solid var(--panel-border);padding:4px 10px;border-radius:999px;margin-bottom:8px;}
 .modal-detail{text-align:left;margin-top:12px;font-size:13px;color:var(--text-dim);}
+.modal-detail-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--panel-border);
+  border:1px solid var(--panel-border);border-radius:12px;overflow:hidden;margin-top:12px;text-align:left;
+}
+.modal-detail-grid .cell{background:var(--bg-elev);padding:10px 13px;}
+.modal-detail-grid .cell.full{grid-column:1/-1;}
+.modal-detail-grid .cell .k{font-size:10px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--text-faint);margin-bottom:3px;}
+.modal-detail-grid .cell .v{font-size:13px;color:var(--text);font-weight:600;word-break:break-word;}
+@media(max-width:520px){.modal-detail-grid{grid-template-columns:1fr;}}
 #cameraPreview{width:100%;max-height:400px;background:#000;border-radius:12px;margin-top:10px;}
 .camera-actions{display:flex;gap:10px;margin-top:16px;}
 .camera-actions button{flex:1;}
@@ -297,6 +312,13 @@ tbody tr:last-child td{border-bottom:none;}
    ASSET / GRID CARDS (ringkasan_aset)
    ============================================================ */
 .section-title{font-size:16px;font-weight:600;display:flex;align-items:center;gap:8px;color:var(--text);}
+.section-head-row{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:4px;}
+.section-total{
+  background:var(--bg-elev-2);border:1px solid var(--panel-border);border-radius:12px;
+  padding:8px 16px;text-align:right;flex-shrink:0;
+}
+.section-total .k{font-size:9.5px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--text-faint);}
+.section-total .v{font-family:'Fraunces',serif;font-size:18px;font-weight:600;color:var(--gold-mid);margin-top:2px;}
 .section-badge{background:var(--bg-elev-2);color:var(--gold-mid);font-size:10.5px;font-weight:800;padding:3px 9px;border-radius:999px;border:1px solid var(--panel-border);}
 .section-sub{margin:4px 0 14px;font-size:12px;color:var(--text-dim);}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;}
@@ -304,8 +326,9 @@ tbody tr:last-child td{border-bottom:none;}
   background:var(--bg-elev-2);border:1px solid var(--panel-border);border-radius:14px;overflow:hidden;cursor:pointer;transition:.2s;
 }
 .asset-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-soft);}
-.asset-img{width:100%;height:120px;object-fit:cover;background:var(--panel);}
-.asset-img.noimg{display:flex;align-items:center;justify-content:center;color:var(--text-faint);font-size:11px;}
+.asset-img{width:100%;height:120px;overflow:hidden;background:var(--panel);}
+.asset-img img{width:100%;height:100%;object-fit:cover;object-position:center;display:block;}
+.asset-img .noimg,.asset-img.noimg{width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--text-faint);font-size:11px;}
 .asset-body{padding:12px;}
 .asset-meta{font-size:11.5px;color:var(--text-dim);margin-top:4px;}
 
@@ -483,22 +506,46 @@ tbody tr:last-child td{border-bottom:none;}
 
     <!-- PERMOHONAN STOK -->
     <section class="card">
-      <h2 class="section-title">Permohonan Stok <span class="section-badge" id="countPermohonan">0</span></h2>
-      <p class="section-sub">Rekod dari Borang Permohonan.</p>
+      <div class="section-head-row">
+        <div>
+          <h2 class="section-title">Permohonan Stok <span class="section-badge" id="countPermohonan">0</span></h2>
+          <p class="section-sub">Rekod dari Borang Permohonan.</p>
+        </div>
+        <div class="section-total">
+          <div class="k">Jumlah Keseluruhan</div>
+          <div class="v" id="totalPermohonan">RM 0.00</div>
+        </div>
+      </div>
       <div class="grid" id="gridPermohonan"><div class="empty">Memuatkan data...</div></div>
     </section>
 
     <!-- PESANAN KERAJAAN -->
     <section class="card">
-      <h2 class="section-title">Pesanan Kerajaan <span class="section-badge" id="countPesanan">0</span></h2>
-      <p class="section-sub">Rekod dari Pesanan Kerajaan (termasuk gambar item).</p>
+      <div class="section-head-row">
+        <div>
+          <h2 class="section-title">Pesanan Kerajaan <span class="section-badge" id="countPesanan">0</span></h2>
+          <p class="section-sub">Rekod dari Pesanan Kerajaan (termasuk gambar item).</p>
+        </div>
+        <div class="section-total">
+          <div class="k">Jumlah Keseluruhan</div>
+          <div class="v" id="totalPesanan">RM 0.00</div>
+        </div>
+      </div>
       <div class="grid" id="gridPesanan"><div class="empty">Memuatkan data...</div></div>
     </section>
 
     <!-- SEBUTHARGA -->
     <section class="card">
-      <h2 class="section-title">Sebutharga <span class="section-badge" id="countSebutharga">0</span></h2>
-      <p class="section-sub">Rekod dari Perincian Bekalan / Sebutharga.</p>
+      <div class="section-head-row">
+        <div>
+          <h2 class="section-title">Sebutharga <span class="section-badge" id="countSebutharga">0</span></h2>
+          <p class="section-sub">Rekod dari Perincian Bekalan / Sebutharga.</p>
+        </div>
+        <div class="section-total">
+          <div class="k">Jumlah Keseluruhan</div>
+          <div class="v" id="totalSebutharga">RM 0.00</div>
+        </div>
+      </div>
       <div class="grid" id="gridSebutharga"><div class="empty">Memuatkan data...</div></div>
     </section>
 
@@ -510,7 +557,7 @@ tbody tr:last-child td{border-bottom:none;}
     <div class="modal-img" id="modalImg"></div>
     <span class="modal-tag" id="modalTag"></span>
     <h3 id="modalTitle"></h3>
-    <div class="modal-detail" id="modalDetail"></div>
+    <div class="modal-detail-grid" id="modalDetail"></div>
     <div id="modalItems"></div>
     <button class="modal-close" onclick="closeModal()">Tutup</button>
   </div>
@@ -570,6 +617,7 @@ function paparSemua() {
       .join(" ").toLowerCase().indexOf(q) !== -1;
   });
   document.getElementById("countPermohonan").textContent = filteredPermohonan.length;
+  document.getElementById("totalPermohonan").textContent = "RM " + formatMoney(sumAmaun(filteredPermohonan, function (it) { return it.amaun; }));
   document.getElementById("gridPermohonan").innerHTML = filteredPermohonan.length
     ? filteredPermohonan.map(renderPermohonanCard).join("")
     : `<div class="empty">Tiada rekod permohonan.</div>`;
@@ -581,6 +629,7 @@ function paparSemua() {
       .join(" ").toLowerCase().indexOf(q) !== -1;
   });
   document.getElementById("countPesanan").textContent = filteredPesanan.length;
+  document.getElementById("totalPesanan").textContent = "RM " + formatMoney(sumAmaun(filteredPesanan, function (it) { return it.jumlah_keseluruhan || it.jumlah; }));
   document.getElementById("gridPesanan").innerHTML = filteredPesanan.length
     ? filteredPesanan.map(renderPesananCard).join("")
     : `<div class="empty">Tiada rekod pesanan.</div>`;
@@ -592,9 +641,21 @@ function paparSemua() {
       .join(" ").toLowerCase().indexOf(q) !== -1;
   });
   document.getElementById("countSebutharga").textContent = filteredSebutharga.length;
+  document.getElementById("totalSebutharga").textContent = "RM " + formatMoney(sumAmaun(filteredSebutharga, function (it) { return it.grand_total; }));
   document.getElementById("gridSebutharga").innerHTML = filteredSebutharga.length
     ? filteredSebutharga.map(renderSebuthargaCard).join("")
     : `<div class="empty">Tiada rekod sebutharga.</div>`;
+}
+
+function formatMoney(value) {
+  const n = Number(String(value || "0").replace(/[^0-9.-]/g, ""));
+  return isNaN(n) ? "0.00" : n.toFixed(2);
+}
+
+function sumAmaun(list, getVal) {
+  return list.reduce(function (acc, item) {
+    return acc + (Number(String(getVal(item) || "0").replace(/[^0-9.-]/g, "")) || 0);
+  }, 0);
 }
 
 function statusClassFor(status) {
@@ -613,6 +674,7 @@ function renderPermohonanCard(item, idx) {
       <div class="asset-body">
         <h3>${escapeHtml(item.item_name || "-")}</h3>
         <div class="asset-meta">
+          <div><b>Amaun:</b> RM ${formatMoney(item.amaun)}</div>
           <div><b>Status:</b> <span class="status ${statusClassFor(item.status)}">${escapeHtml(item.status || "PENDING")}</span></div>
         </div>
       </div>
@@ -634,6 +696,7 @@ function renderPesananCard(item, idx) {
       <div class="asset-body">
         <h3>${escapeHtml(item.no_dokumen || "-")}</h3>
         <div class="asset-meta">
+          <div><b>Amaun:</b> RM ${formatMoney(item.jumlah_keseluruhan || item.jumlah)}</div>
           <div><b>Status:</b> <span class="status ${statusClassFor(item.status)}">${escapeHtml(item.status || "DRAF")}</span></div>
         </div>
       </div>
@@ -648,6 +711,7 @@ function renderSebuthargaCard(item, idx) {
       <div class="asset-body">
         <h3>${escapeHtml(item.no_sebutharga || "-")}</h3>
         <div class="asset-meta">
+          <div><b>Amaun:</b> RM ${formatMoney(item.grand_total)}</div>
           <div><b>Status:</b> <span class="status ${statusClassFor(item.status)}">${escapeHtml(item.status || "DRAF")}</span></div>
         </div>
       </div>
@@ -731,8 +795,16 @@ function openModal(type, idx) {
     : `<div class="noimg">Tiada gambar</div>`;
   document.getElementById("modalTag").textContent = tag;
   document.getElementById("modalTitle").textContent = title;
+
+  // baris yang perlu lebar penuh (kandungan panjang seperti alamat/perihal)
+  const fullWidthKeys = ["Alamat Penghantaran", "Perihal", "Kod Pegawai Pengawal", "Program / Aktiviti"];
+
   document.getElementById("modalDetail").innerHTML = rows
-    .map(function (r) { return `<div><b>${escapeHtml(r[0])}:</b> ${escapeHtml(r[1] || "-")}</div>`; })
+    .map(function (r) {
+      const isFull = fullWidthKeys.indexOf(r[0]) !== -1;
+      const val = (r[1] === 0 ? "0" : r[1]) || "-";
+      return `<div class="cell${isFull ? " full" : ""}"><div class="k">${escapeHtml(r[0])}</div><div class="v">${escapeHtml(val)}</div></div>`;
+    })
     .join("");
   document.getElementById("modalItems").innerHTML = itemsHtml;
 
