@@ -81,19 +81,25 @@
     }
 
     .logo {
-      width: 80px;
-      height: 80px;
-      background: linear-gradient(135deg, var(--gold-pale), var(--gold-mid));
+      width: 110px;
+      height: 110px;
+      background: #fffdf8;
       border-radius: 18px;
       display: flex;
       align-items: center;
       justify-content: center;
       margin: 0 auto 20px;
-      font-size: 32px;
-      font-weight: 800;
-      color: #241c07;
+      padding: 10px;
       box-shadow: 0 12px 28px rgba(204, 171, 108, .25);
       transition: .3s;
+      overflow: hidden;
+    }
+
+    .logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
     }
 
     .logo:hover {
@@ -295,9 +301,8 @@
       }
 
       .logo {
-        width: 70px;
-        height: 70px;
-        font-size: 28px;
+        width: 90px;
+        height: 90px;
       }
     }
 
@@ -316,9 +321,10 @@
 <body>
 
   <!-- Video Background -->
+  <!-- PENTING: pastikan nama fail di bawah SAMA dengan nama sebenar video dalam folder -->
   <video class="video-bg" autoplay muted loop playsinline>
     <source src="video_pkpj.mp4.mp4" type="video/mp4">
-    <!-- Fallback: solid background jika video tak dimainkan -->
+    <!-- Fallback: background gelap jika video tak dimainkan -->
   </video>
   <div class="video-overlay"></div>
 
@@ -326,7 +332,8 @@
   <div class="container">
     <!-- Header -->
     <div class="header">
-      <div class="logo"><img src="pkpj.png" style="width: 80px; height:60px"></div>
+      <!-- PENTING: pastikan nama fail logo SAMA dengan nama sebenar dalam folder -->
+      <div class="logo"><img src="pkpj.png" alt="Logo PKPJ"></div>
       <h1>PKPJ</h1>
       <p>Sistem Pengurusan Stok</p>
     </div>
@@ -339,11 +346,11 @@
       <form id="loginForm" onsubmit="handleLogin(event)">
         <div class="form-group">
           <label for="username">Nama / Username</label>
-          <input 
-            type="text" 
-            id="username" 
-            placeholder="Masukkan nama anda" 
-            required 
+          <input
+            type="text"
+            id="username"
+            placeholder="Masukkan nama anda"
+            required
             autocomplete="off"
           >
         </div>
@@ -393,29 +400,17 @@
       setTimeout(function () {
         localStorage.setItem('pkpj_user', username);
         localStorage.setItem('pkpj_login_time', new Date().toISOString());
-        
+
         // Redirect ke index
         window.location.href = 'index.html';
       }, 600);
     }
 
-    // Check if already logged in
+    // NOTA: auto-redirect "kalau dah login terus ke index" telah DIBUANG,
+    // supaya home page ini SENTIASA terpapar setiap kali dibuka.
     window.addEventListener('DOMContentLoaded', function () {
-      const user = localStorage.getItem('pkpj_user');
-      if (user) {
-        // Redirect terus ke index kalau dah login
-        window.location.href = 'index.html';
-      }
-
       // Auto focus input
       document.getElementById('username').focus();
-    });
-
-    // Allow Enter key
-    document.getElementById('username').addEventListener('keypress', function (e) {
-      if (e.key === 'Enter') {
-        document.getElementById('loginForm').dispatchEvent(new Event('submit'));
-      }
     });
   </script>
 
