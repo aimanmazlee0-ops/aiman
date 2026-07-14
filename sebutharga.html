@@ -182,6 +182,22 @@ textarea{min-height:70px;resize:vertical;}
 .search{width:100%;}
 
 /* ============================================================
+   PESANAN LINK BOX (baharu)
+   ============================================================ */
+.link-pesanan-box{
+  border:1.5px dashed var(--panel-border);border-radius:14px;padding:14px 16px;
+  background:var(--bg-elev-2);margin-bottom:18px;display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;
+}
+.link-pesanan-box .field{flex:1;min-width:220px;}
+.link-pesanan-box .status-pill{
+  font-size:11px;font-weight:700;padding:6px 12px;border-radius:999px;white-space:nowrap;
+  background:var(--info-bg);color:var(--info);
+}
+.link-pesanan-box .status-pill.ok{background:var(--ok-bg);color:var(--ok);}
+.link-pesanan-box .status-pill.none{background:var(--panel);color:var(--text-faint);border:1px solid var(--panel-border);}
+.link-pesanan-thumb{width:52px;height:52px;border-radius:10px;object-fit:cover;border:1px solid var(--panel-border);background:var(--panel);flex-shrink:0;}
+
+/* ============================================================
    TABLES
    ============================================================ */
 .table-wrap,.items-table-wrap{overflow-x:auto;border-radius:14px;border:1px solid var(--panel-border);}
@@ -202,6 +218,8 @@ tbody tr:last-child td{border-bottom:none;}
 .price-col{width:120px;}
 .amount-col{width:130px;}
 .action-col,.action-buttons{width:90px;}
+.thumb-col{width:64px;}
+.row-thumb{width:44px;height:44px;object-fit:cover;border-radius:8px;border:1px solid var(--panel-border);background:var(--panel);}
 
 /* ============================================================
    TOTALS
@@ -483,6 +501,23 @@ tbody tr:last-child td{border-bottom:none;}
       <button class="btn-gray" onclick="resetPage()">Reset</button>
     </div>
 
+    <!-- ============================================================
+         PAUTAN KE PESANAN KERAJAAN (baharu)
+         Pilih rekod Pesanan Kerajaan supaya PO No auto-isi & disepadankan
+         dengan No Dokumen Pesanan — ini yang membolehkan gambar item
+         auto keluar kat Ringkasan Aset.
+         ============================================================ -->
+    <section class="link-pesanan-box">
+      <img id="linkPesananThumb" class="link-pesanan-thumb" style="display:none;" alt="Gambar Pesanan">
+      <div class="field">
+        <label>Pautkan dengan Pesanan Kerajaan (pilihan)</label>
+        <select id="linkPesananSelect" onchange="onPilihPesanan()">
+          <option value="">-- Tiada pautan / isi PO No manual --</option>
+        </select>
+      </div>
+      <span class="status-pill none" id="linkPesananStatus">Tiada pautan</span>
+    </section>
+
     <section class="document-box">
       <input type="hidden" id="edit_id">
 
@@ -593,8 +628,10 @@ tbody tr:last-child td{border-bottom:none;}
         <table>
           <thead>
             <tr>
+              <th class="thumb-col">Gambar</th>
               <th>ID</th>
               <th>No Sebutharga</th>
+              <th>PO No</th>
               <th>Tarikh</th>
               <th>Perihal Bekalan</th>
               <th>Kuantiti</th>
@@ -608,7 +645,7 @@ tbody tr:last-child td{border-bottom:none;}
 
           <tbody id="senaraiSebutharga">
             <tr>
-              <td colspan="10">Memuatkan data...</td>
+              <td colspan="12">Memuatkan data...</td>
             </tr>
           </tbody>
         </table>
@@ -627,6 +664,7 @@ tbody tr:last-child td{border-bottom:none;}
     location.hostname === "localhost";
 
   let allSebutharga = [];
+  let allPesananList = []; // senarai Pesanan Kerajaan untuk dropdown pautan
 
   document.addEventListener("DOMContentLoaded", function () {
     const tarikh = document.getElementById("tarikh");
@@ -634,6 +672,7 @@ tbody tr:last-child td{border-bottom:none;}
 
     kiraJumlah();
     loadSebutharga();
+    loadPesananUntukPautan();
   });
 
   function setMsg(text, color) {
@@ -687,6 +726,113 @@ tbody tr:last-child td{border-bottom:none;}
     }
 
     return result;
+  }
+
+  // ============================================================
+  // PAUTAN KE PESANAN KERAJAAN (baharu)
+  // ============================================================
+  async function loadPesananUntukPautan() {
+    const select = document.getElementById("linkPesananSelect");
+    if (!select) return;
+
+    try {
+      const url = `${APPS_SCRIPT_URL}?secret=${encodeURIComponent(SHEET_SECRET)}&action=pesanan_list`;
+      const res = await fetch(url);
+      const result = await res.json();
+
+      if (!result.ok) throw new Error(result.error || "Gagal baca senarai pesanan.");
+
+      allPesananList = result.data || [];
+
+      let opts = `<option value="">-- Tiada pautan / isi PO No manual --</option>`;
+      allPesananList.forEach(function (p) {
+        const label = (p.no_dokumen || p.id) + (p.pembekal ? " — " + p.pembekal : "");
+        opts += `<option value="${escapeHtml(p.id)}">${escapeHtml(label)}</option>`;
+      });
+      select.innerHTML = opts;
+
+      // Jika sedang mode edit dan po_no sudah dipadan dengan salah satu no_dokumen, auto-pilih
+      syncLinkSelectWithPoNo();
+
+    } catch (err) {
+      // Senyap sahaja — dropdown akan kekal kosong, user masih boleh isi PO No manual
+      console.error("Gagal muat senarai pesanan untuk pautan:", err.message);
+    }
+  }
+
+  function onPilihPesanan() {
+    const select = document.getElementById("linkPesananSelect");
+    const id = select.value;
+
+    if (!id) {
+      updateLinkPesananStatus(null);
+      return;
+    }
+
+    const p = allPesananList.find(function (x) { return String(x.id) === String(id); });
+    if (!p) {
+      updateLinkPesananStatus(null);
+      return;
+    }
+
+    // Auto-isi PO No supaya sepadan dengan No Dokumen Pesanan
+    setField("po_no", p.no_dokumen || "");
+
+    updateLinkPesananStatus(p);
+  }
+
+  function updateLinkPesananStatus(p) {
+    const pill = document.getElementById("linkPesananStatus");
+    const thumb = document.getElementById("linkPesananThumb");
+
+    if (!p) {
+      pill.textContent = "Tiada pautan";
+      pill.className = "status-pill none";
+      thumb.style.display = "none";
+      thumb.src = "";
+      return;
+    }
+
+    pill.textContent = "Dipautkan: " + (p.no_dokumen || p.id);
+    pill.className = "status-pill ok";
+
+    const gambarItemObj = (p.items || []).find(function (it) { return it.gambar_item; });
+    const gambar = (gambarItemObj && gambarItemObj.gambar_item) || p.gambar || "";
+
+    if (gambar) {
+      thumb.src = gambar;
+      thumb.style.display = "block";
+    } else {
+      thumb.style.display = "none";
+      thumb.src = "";
+    }
+  }
+
+  // Bila masuk mode edit rekod sedia ada, cuba padan po_no semasa dengan
+  // salah satu no_dokumen dalam senarai pesanan supaya dropdown & thumbnail
+  // terus terpapar betul.
+  function syncLinkSelectWithPoNo() {
+    const select = document.getElementById("linkPesananSelect");
+    if (!select || !allPesananList.length) return;
+
+    const poNo = normKeyClient(getValue("po_no"));
+    if (!poNo) { updateLinkPesananStatus(null); return; }
+
+    const match = allPesananList.find(function (p) {
+      return normKeyClient(p.no_dokumen) === poNo;
+    });
+
+    if (match) {
+      select.value = match.id;
+      updateLinkPesananStatus(match);
+    } else {
+      select.value = "";
+      updateLinkPesananStatus(null);
+    }
+  }
+
+  function normKeyClient(v) {
+    return String(v || "").trim().toUpperCase();
   }
 
   function tambahItem() {
@@ -864,7 +1010,7 @@ tbody tr:last-child td{border-bottom:none;}
     } catch (err) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="10">Gagal load: ${escapeHtml(err.message)}</td>
+          <td colspan="12">Gagal load: ${escapeHtml(err.message)}</td>
         </tr>
       `;
     }
@@ -876,7 +1022,7 @@ tbody tr:last-child td{border-bottom:none;}
     if (!data.length) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="10">Tiada sebutharga direkodkan.</td>
+          <td colspan="12">Tiada sebutharga direkodkan.</td>
         </tr>
       `;
       return;
@@ -886,11 +1032,17 @@ tbody tr:last-child td{border-bottom:none;}
 
     data.forEach(function (d) {
 
+      const thumbHtml = d.gambar
+        ? `<img class="row-thumb" src="${escapeHtml(d.gambar)}" alt="Gambar" loading="lazy">`
+        : `<span style="color:var(--text-faint);font-size:10.5px;">-</span>`;
+
       if (!d.items || d.items.length === 0) {
         html += `
           <tr>
+            <td class="thumb-col">${thumbHtml}</td>
             <td>${escapeHtml(d.id)}</td>
             <td>${escapeHtml(d.no_sebutharga)}</td>
+            <td>${escapeHtml(d.po_no || "-")}</td>
             <td>${escapeHtml(d.tarikh)}</td>
             <td>-</td>
             <td>-</td>
@@ -918,12 +1070,20 @@ tbody tr:last-child td{border-bottom:none;}
           html += `
             <tr>
 
+              <td class="thumb-col">
+                ${index === 0 ? thumbHtml : ""}
+              </td>
+
               <td>
                 ${index === 0 ? escapeHtml(d.id) : ""}
               </td>
 
               <td>
                 ${index === 0 ? escapeHtml(d.no_sebutharga) : ""}
+              </td>
+
+              <td>
+                ${index === 0 ? escapeHtml(d.po_no || "-") : ""}
               </td>
 
               <td>
@@ -999,6 +1159,9 @@ tbody tr:last-child td{border-bottom:none;}
     setField("grand_total", d.grand_total);
 
     loadItemsToTable(d.items || []);
+
+    // Cuba padan dropdown pautan Pesanan dengan PO No rekod ni
+    syncLinkSelectWithPoNo();
 
     setMsg("Mode edit: " + d.id, "#2563eb");
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -1076,6 +1239,10 @@ tbody tr:last-child td{border-bottom:none;}
     tbody.innerHTML = "";
     tambahItem();
     kiraJumlah();
+
+    const select = document.getElementById("linkPesananSelect");
+    if (select) select.value = "";
+    updateLinkPesananStatus(null);
   }
 
   function resetPage() {
