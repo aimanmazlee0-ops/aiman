@@ -256,6 +256,9 @@ tbody tr:last-child td{border-bottom:none;}
 .saving-check.show{display:block;animation:pkPop .5s cubic-bezier(.2,.9,.3,1.5);}
 .saving-check svg{width:100%;height:100%;display:block;filter:drop-shadow(0 8px 14px rgba(31,122,77,.45));}
 @keyframes pkPop{0%{transform:scale(0) rotate(-12deg);opacity:0;}60%{transform:scale(1.18) rotate(4deg);}100%{transform:scale(1) rotate(0);opacity:1;}}
+.row-deleting{animation:rowOut .42s ease forwards;transform-origin:center;}
+.row-deleting td{background:var(--err-bg) !important;color:var(--err) !important;}
+@keyframes rowOut{0%{opacity:1;transform:translateX(0);}30%{opacity:.7;transform:translateX(-8px);}100%{opacity:0;transform:translateX(60px) scale(.96);}}
 .saving-title{font-weight:700;margin-bottom:4px;}
 .saving-text{font-size:12.5px;color:var(--text-dim);}
 
@@ -1416,13 +1419,22 @@ tbody tr:last-child td{border-bottom:none;}
   function deletePesananByIndex(index) {
     const d = allPesanan[index];
     if (!d) return;
-    deletePesanan(d.id);
+    if (!confirm("Padam pesanan ini?")) return;
+
+    const tbody = document.getElementById("senaraiPesanan");
+    const row = tbody ? tbody.children[index] : null;
+    if (row) {
+      row.classList.add("row-deleting");
+      setTimeout(function () { deletePesanan(d.id); }, 420);
+    } else {
+      deletePesanan(d.id);
+    }
   }
 
   async function deletePesanan(id) {
-    if (!confirm("Padam pesanan ini?")) return;
-
     try {
+      showSavingPopup("Sedang memadam...", "Sila tunggu, rekod sedang dipadam.");
+
       const res = await fetch(APPS_SCRIPT_URL, {
         method: "POST",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
@@ -1439,13 +1451,19 @@ tbody tr:last-child td{border-bottom:none;}
         throw new Error(result.error || "Gagal delete.");
       }
 
+      await loadPesanan();
+
+      showDonePopup("Berjaya dipadam!", "Rekod pesanan telah dipadam.", true);
       setMsg("Pesanan berjaya dipadam.", "#16a34a");
       showToast("Pesanan berjaya dipadam.", "success");
-      loadPesanan();
+
+      setTimeout(function () { hideSavingPopup(); }, 1500);
 
     } catch (err) {
-      alert("Gagal delete: " + err.message);
+      showDonePopup("Gagal dipadam", err.message, false);
+      setMsg("Gagal delete: " + err.message, "#dc2626");
       showToast("Gagal delete: " + err.message, "error");
+      setTimeout(function () { hideSavingPopup(); }, 1800);
     }
   }
 
